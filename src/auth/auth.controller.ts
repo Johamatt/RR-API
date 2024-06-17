@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { OAuth2Client } from 'google-auth-library';
-import { User } from 'src/users/users.entity';
+import { User } from '../users/users.entity';
 import { LoginUserDto, RegisterUserDto } from '../dto/UserDto';
 import { ErrorDto } from '../dto/ErrorDto';
 

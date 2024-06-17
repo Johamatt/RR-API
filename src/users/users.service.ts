@@ -12,8 +12,8 @@ import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import { compare } from 'bcrypt';
-import { RegisterUserDto } from 'src/dto/UserDto';
-import { ErrorDto } from 'src/dto/ErrorDto';
+import { RegisterUserDto } from '../dto/UserDto';
+import { ErrorDto } from '../dto/ErrorDto';
 
 @Injectable()
 export class UsersService {

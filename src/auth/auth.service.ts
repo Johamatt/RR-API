@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OAuth2Client } from 'google-auth-library';
-import { User } from 'src/users/users.entity';
+import { User } from '../users/users.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 @Injectable()
