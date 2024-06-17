@@ -5,7 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Place } from '../places/places.entity';
 import { AppModule } from '../app.module';
-import { CreatePlaceDto } from '../places/CreatePlaceDto';
+import { CreatePlaceDto } from '../dto/CreatePlaceDto';
 
 const appDataSource = new DataSource({
   type: 'postgres',

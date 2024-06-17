@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { Place } from './places.entity';
-import { CreatePlaceDto } from './CreatePlaceDto';
-import { GeoJsonDto } from './GeoJsonDto';
+import { CreatePlaceDto } from '../dto/CreatePlaceDto';
+import { GeoJsonDto } from '../dto/GeoJsonDto';
 
 @Controller('places')
 export class PlacesController {
