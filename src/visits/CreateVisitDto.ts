@@ -1,19 +1,18 @@
-import { IsDateString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDateString } from 'class-validator';
 
 export class CreateVisitDto {
-  @IsNotEmpty()
-  @IsNumber()
-  user_id: number;
+    @IsNumber()
+    @IsNotEmpty()
+    user_id: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  place_id: string;
+    @IsNumber()
+    @IsNotEmpty()
+    points_awarded: number;
 
-  @IsNotEmpty()
-  @IsDateString()
-  visit_date: Date;
+    @IsNotEmpty()
+    placeId: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  points_awarded: number;
+    @IsDateString()
+    @IsNotEmpty()
+    visit_date: string;
 }

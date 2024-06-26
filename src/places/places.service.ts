@@ -12,9 +12,10 @@ export class PlacesService {
     private readonly repository: Repository<Place>,
   ) {}
 
-  public getPlace(place_id: string): Promise<Place> {
+  public findById(place_id: string): Promise<Place> {
     return this.repository.findOne({ where: { place_id } });
   }
+
 
   public createPlace(body: CreatePlaceDto): Promise<Place> {
     const place: Place = new Place();

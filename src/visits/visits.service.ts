@@ -1,65 +1,50 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { CreateVisitDto } from './CreateVisitDto';
+import { Visit } from './visits.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Visit } from './visits.entity';
-import { CreateVisitDto } from './CreateVisitDto';
-import { Place } from '../places/places.entity';
-import { User } from '../users/users.entity';
+import { validate } from 'class-validator';
+import { UsersService } from '../users/users.service';
+import { PlacesService } from '../places/places.service';
 
 @Injectable()
 export class VisitsService {
   constructor(
     @InjectRepository(Visit)
     private readonly visitRepository: Repository<Visit>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Place)
-    private readonly placeRepository: Repository<Place>,
+    private readonly userService: UsersService, 
+    private readonly placeService: PlacesService, 
   ) {}
 
-  public async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
-    const user = await this.userRepository.findOne({
-      where: { user_id: createVisitDto.user_id },
-    });
+  async validateCreateVisitDto(
+    createVisitDto: CreateVisitDto,
+  ): Promise<CreateVisitDto> {
+    const errors = await validate(createVisitDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+    return createVisitDto;
+  }
+
+  async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
+    const newVisit = new Visit();
+    const user = await this.userService.findById(createVisitDto.user_id);
+    const place = await this.placeService.findById(createVisitDto.placeId);
+
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException(
+        `User with ID ${createVisitDto.user_id} not found`,
+      );
     }
-
-    const place = await this.placeRepository.findOne({
-      where: { place_id: createVisitDto.place_id },
-    });
     if (!place) {
-      throw new NotFoundException('Place not found');
+      throw new BadRequestException(
+        `Place with ID ${createVisitDto.placeId} not found`,
+      );
     }
-
-    const visit = this.visitRepository.create({
-      ...createVisitDto,
-      user,
-      place,
-    });
-
-    return this.visitRepository.save(visit);
-  }
-
-  public async findAll(): Promise<Visit[]> {
-    return this.visitRepository.find({ relations: ['user', 'place'] });
-  }
-
-  public async findOne(id: number): Promise<Visit> {
-    const visit = await this.visitRepository.findOne({
-      where: { visit_id: id },
-      relations: ['user', 'place'],
-    });
-    if (!visit) {
-      throw new NotFoundException('Visit not found');
-    }
-    return visit;
-  }
-
-  public async remove(id: number): Promise<void> {
-    const result = await this.visitRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException('Visit not found');
-    }
+    newVisit.user = user;
+    newVisit.place = place;
+    newVisit.visit_date = new Date(createVisitDto.visit_date);
+    newVisit.points_awarded = createVisitDto.points_awarded;
+    return this.visitRepository.save(newVisit);
   }
 }

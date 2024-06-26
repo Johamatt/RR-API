@@ -11,7 +11,7 @@ export class PlacesController {
 
   @Get(':id')
   public getPlace(@Param('id') id: string): Promise<Place> {
-    return this.service.getPlace(id);
+    return this.service.findById(id);
   }
 
   @Post()

@@ -26,6 +26,10 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { googleId } });
   }
 
+  async findById(id: number): Promise<User> {
+    return this.usersRepository.findOne({ where: { user_id: id } });
+  }
+
   async findByEmail(email: string): Promise<User | undefined> {
     try {
       const user = await this.usersRepository.findOne({ where: { email } });

@@ -1,29 +1,24 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { VisitsService } from './visits.service';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { CreateVisitDto } from './CreateVisitDto';
 import { Visit } from './visits.entity';
+import { VisitsService } from './visits.service';
 
 @Controller('visits')
 export class VisitsController {
   constructor(private readonly visitsService: VisitsService) {}
 
   @Post()
-  public create(@Body() createVisitDto: CreateVisitDto): Promise<Visit> {
-    return this.visitsService.createVisit(createVisitDto);
-  }
-
-  @Get()
-  public findAll(): Promise<Visit[]> {
-    return this.visitsService.findAll();
-  }
-
-  @Get(':id')
-  public findOne(@Param('id') id: number): Promise<Visit> {
-    return this.visitsService.findOne(id);
-  }
-
-  @Delete(':id')
-  public remove(@Param('id') id: number): Promise<void> {
-    return this.visitsService.remove(id);
+  async create(@Body() createVisitDto: CreateVisitDto): Promise<Visit> {
+    try {
+      const validatedDto =
+        await this.visitsService.validateCreateVisitDto(createVisitDto);
+      return this.visitsService.createVisit(validatedDto);
+    } catch (error) {
+      throw new BadRequestException({
+        message: error,
+        error: 'Bad Request',
+        statusCode: 400,
+      });
+    }
   }
 }
