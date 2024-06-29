@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpStatus,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CreateVisitDto } from './CreateVisitDto';
 import { Visit } from './visits.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +12,7 @@ import { Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
 import { PlacesService } from '../places/places.service';
+import { ErrorDto } from '../dto/ErrorDto';
 
 @Injectable()
 export class VisitsService {
@@ -27,23 +34,47 @@ export class VisitsService {
   }
 
   async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
-    const newVisit = new Visit();
-    const user = await this.userService.findById(createVisitDto.user_id);
-    const place = await this.placeService.findById(createVisitDto.placeId);
+    const { user_id, placeId, points_awarded } = createVisitDto;
+
+    const user = await this.userService.findById(user_id);
+    const place = await this.placeService.findById(placeId);
 
     if (!user) {
-      throw new BadRequestException(
-        `User with ID ${createVisitDto.user_id} not found`,
-      );
+      const errorMessage: ErrorDto = {
+        message: [`User with ID ${user_id} not found`],
+        error: HttpStatus.NOT_FOUND,
+        statusCode: 404,
+      };
+      throw new NotFoundException(errorMessage);
     }
     if (!place) {
-      throw new BadRequestException(
-        `Place with ID ${createVisitDto.placeId} not found`,
-      );
+      const errorMessage: ErrorDto = {
+        message: [`Place with ID ${placeId} not found`],
+        error: HttpStatus.NOT_FOUND,
+        statusCode: 404,
+      };
+      throw new NotFoundException(errorMessage);
     }
+
+    const existingVisit = await this.visitRepository.findOne({
+      where: { user: { user_id }, place: { place_id: placeId } },
+    });
+
+    if (existingVisit) {
+      const errorMessage: ErrorDto = {
+        message: [`You have already claimed this reward`],
+        error: HttpStatus.CONFLICT,
+        statusCode: 400,
+      };
+
+      throw new ConflictException(errorMessage);
+    }
+
+    const newVisit = new Visit();
     newVisit.user = user;
     newVisit.place = place;
-    newVisit.points_awarded = createVisitDto.points_awarded;
+    newVisit.points_awarded = points_awarded;
+
     return this.visitRepository.save(newVisit);
   }
 }
