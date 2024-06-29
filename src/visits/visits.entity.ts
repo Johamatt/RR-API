@@ -20,9 +20,6 @@ export class Visit {
   place: Place;
 
   @Column()
-  visit_date: Date;
-
-  @Column()
   points_awarded: number;
 
   @CreateDateColumn()

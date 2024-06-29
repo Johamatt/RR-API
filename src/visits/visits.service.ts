@@ -12,8 +12,8 @@ export class VisitsService {
   constructor(
     @InjectRepository(Visit)
     private readonly visitRepository: Repository<Visit>,
-    private readonly userService: UsersService, 
-    private readonly placeService: PlacesService, 
+    private readonly userService: UsersService,
+    private readonly placeService: PlacesService,
   ) {}
 
   async validateCreateVisitDto(
@@ -43,7 +43,6 @@ export class VisitsService {
     }
     newVisit.user = user;
     newVisit.place = place;
-    newVisit.visit_date = new Date(createVisitDto.visit_date);
     newVisit.points_awarded = createVisitDto.points_awarded;
     return this.visitRepository.save(newVisit);
   }
