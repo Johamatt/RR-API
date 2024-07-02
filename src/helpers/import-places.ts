@@ -6,18 +6,33 @@ import { validate } from 'class-validator';
 import { Place } from '../places/places.entity';
 import { AppModule } from '../app.module';
 import { CreatePlaceDto } from '../dto/CreatePlaceDto';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+dotenv.config({ path: '../../.env' });
+
+const databaseHost = process.env.DATABASE_HOST;
+const databasePort = Number(process.env.DATABASE_PORT);
+const databaseUser = process.env.DATABASE_USER;
+const databasePassword = process.env.DATABASE_PASSWORD;
+const databaseName = process.env.DATABASE_NAME;
+
+console.log('Database Host:', databaseHost);
+console.log('Database Port:', databasePort);
+console.log('Database User:', databaseUser);
+console.log('Database Password:', databasePassword);
+console.log('Database Name:', databaseName);
 
 const appDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DATABASE_HOST,
-  port: 5432,
-  username: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_NAME,
+  host: databaseHost,
+  port: databasePort,
+  username: databaseUser,
+  password: databasePassword,
+  database: databaseName,
   synchronize: true,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 });
-
 const main = async () => {
   try {
     console.time('main');
@@ -26,7 +41,8 @@ const main = async () => {
     const app = await NestFactory.createApplicationContext(AppModule);
     const placeRepository = appDataSource.getRepository(Place);
 
-    const data = fs.readFileSync('places.geojson', 'utf8');
+    const geojsonFilePath = path.resolve(__dirname, '../../places.geojson');
+    const data = fs.readFileSync(geojsonFilePath, 'utf8');
     const geojson = JSON.parse(data);
 
     for (const feature of geojson.features) {
