@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +15,7 @@ import * as bcrypt from 'bcrypt';
 import { compare } from 'bcrypt';
 import { RegisterUserDto } from '../dto/UserDto';
 import { ErrorDto } from '../dto/ErrorDto';
+import { UpdateCountryDto } from '../dto/UpdateCountryDto';
 
 @Injectable()
 export class UsersService {
@@ -110,5 +112,22 @@ export class UsersService {
         throw new InternalServerErrorException(errorMessage);
       }
     }
+  }
+
+  async updateCountry(
+    user_id: number,
+    updateCountryDto: UpdateCountryDto,
+  ): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { user_id } });
+    if (!user) {
+      const errorMessage: ErrorDto = {
+        message: [`User with ID ${user_id} not found`],
+        error: HttpStatus.BAD_REQUEST,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+      throw new NotFoundException(errorMessage);
+    }
+    user.country = updateCountryDto.country;
+    return this.usersRepository.save(user);
   }
 }

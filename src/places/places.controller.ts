@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  ParseEnumPipe,
+  Post,
+} from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { Place } from './places.entity';
 import { CreatePlaceDto } from '../dto/CreatePlaceDto';
 import { GeoJsonDto } from '../dto/GeoJsonDto';
+import { Country } from '../enums/Country';
 
 @Controller('places')
 export class PlacesController {
@@ -22,6 +31,13 @@ export class PlacesController {
   @Get()
   public findAll(): Promise<GeoJsonDto> {
     return this.service.findAll();
+  }
+
+  @Get('country/:country')
+  public findByCountry(
+    @Param('country', new ParseEnumPipe(Country)) country: Country,
+  ): Promise<GeoJsonDto> {
+    return this.service.findByCountry(country);
   }
 
   @Post('check-proximity')

@@ -22,6 +22,9 @@ export class User {
   email: string;
 
   @Column({ nullable: true })
+  country: string;
+
+  @Column({ nullable: true })
   password: string;
 
   @Column({ default: 0 })

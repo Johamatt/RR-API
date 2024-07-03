@@ -16,7 +16,7 @@ export class PlacesService {
     return this.repository.findOne({ where: { place_id } });
   }
 
-
+  
   public createPlace(body: CreatePlaceDto): Promise<Place> {
     const place: Place = new Place();
 
@@ -30,6 +30,27 @@ export class PlacesService {
 
   public async findAll(): Promise<GeoJsonDto> {
     const places = await this.repository.find();
+    const features = places.map((place) => ({
+      type: 'Feature',
+      geometry: place.coordinates,
+      properties: {
+        place_id: place.place_id,
+        name: place.name,
+        description: place.description,
+        points: place.points,
+        created_at: place.created_at,
+        updated_at: place.updated_at,
+      },
+    }));
+
+    return {
+      type: 'FeatureCollection',
+      features,
+    };
+  }
+
+  public async findByCountry(country: string): Promise<GeoJsonDto> {
+    const places = await this.repository.find({ where: { country } });
     const features = places.map((place) => ({
       type: 'Feature',
       geometry: place.coordinates,

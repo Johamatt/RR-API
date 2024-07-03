@@ -60,6 +60,7 @@ const main = async () => {
             coordinates: [longitude, latitude],
           },
           points: 0,
+          country: 'Norway',
         };
 
         const errors = await validate(
