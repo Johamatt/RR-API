@@ -6,33 +6,39 @@ import {
   Param,
   ParseEnumPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { Place } from './places.entity';
 import { CreatePlaceDto } from '../dto/CreatePlaceDto';
 import { GeoJsonDto } from '../dto/GeoJsonDto';
 import { Country } from '../enums/Country';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('places')
 export class PlacesController {
   @Inject(PlacesService)
   private readonly service: PlacesService;
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   public getPlace(@Param('id') id: string): Promise<Place> {
     return this.service.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   public createPlace(@Body() body: CreatePlaceDto): Promise<Place> {
     return this.service.createPlace(body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   public findAll(): Promise<GeoJsonDto> {
     return this.service.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('country/:country')
   public findByCountry(
     @Param('country', new ParseEnumPipe(Country)) country: Country,
@@ -40,6 +46,7 @@ export class PlacesController {
     return this.service.findByCountry(country);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('check-proximity')
   public async checkProximity(
     @Body() body: any,

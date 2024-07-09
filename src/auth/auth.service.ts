@@ -4,11 +4,13 @@ import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/users.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
   private client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -30,5 +32,12 @@ export class AuthService {
       return user;
     }
     return null;
+  }
+
+  async login(user: User) {
+    const payload = { email: user.email, sub: user.user_id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

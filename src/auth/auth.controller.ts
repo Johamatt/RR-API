@@ -4,23 +4,28 @@ import {
   Body,
   HttpStatus,
   ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/users.entity';
 import { LoginUserDto, RegisterUserDto } from '../dto/UserDto';
 import { ErrorDto } from '../dto/ErrorDto';
+import { AuthService } from './auth.service';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('google')
   async authenticate(
     @Body('idToken') idToken: string,
-  ): Promise<{ message: string; user: User }> {
+  ): Promise<{ message: string; user: User; jwtToken?: string }> {
     const ticket = await client.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -38,10 +43,12 @@ export class AuthController {
 
     if (!user) {
       user = await this.usersService.createGoogleUser(googleId, email);
-      return { message: 'User created', user };
+      const { access_token } = await this.authService.login(user);
+      return { message: 'User created', user, jwtToken: access_token };
     }
 
-    return { message: 'Success', user };
+    const { access_token } = await this.authService.login(user);
+    return { message: 'Success', user, jwtToken: access_token };
   }
 
   @Post('register')
@@ -52,7 +59,8 @@ export class AuthController {
 
     if (!user) {
       user = await this.usersService.createUser(body);
-      return { message: 'User created', user };
+      const token = await this.authService.login(user);
+      return { message: 'User created', user, ...token };
     }
     if (user) {
       const errorMessage: ErrorDto = {
@@ -70,6 +78,11 @@ export class AuthController {
 
     let user = await this.usersService.findByEmailAndPassword(email, password);
 
-    return { message: 'Logged in', user };
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const token = await this.authService.login(user);
+    return { message: 'Logged in', user, ...token };
   }
 }
