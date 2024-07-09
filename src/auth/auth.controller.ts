@@ -43,12 +43,12 @@ export class AuthController {
 
     if (!user) {
       user = await this.usersService.createGoogleUser(googleId, email);
-      const { access_token } = await this.authService.login(user);
-      return { message: 'User created', user, jwtToken: access_token };
+      const { jwtToken } = await this.authService.login(user);
+      return { message: 'User created', user, jwtToken: jwtToken };
     }
 
-    const { access_token } = await this.authService.login(user);
-    return { message: 'Success', user, jwtToken: access_token };
+    const { jwtToken } = await this.authService.login(user);
+    return { message: 'Success', user, jwtToken: jwtToken };
   }
 
   @Post('register')
@@ -59,8 +59,8 @@ export class AuthController {
 
     if (!user) {
       user = await this.usersService.createUser(body);
-      const token = await this.authService.login(user);
-      return { message: 'User created', user, ...token };
+      const jwtToken = await this.authService.login(user);
+      return { message: 'User created', user, ...jwtToken };
     }
     if (user) {
       const errorMessage: ErrorDto = {
@@ -82,7 +82,7 @@ export class AuthController {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = await this.authService.login(user);
-    return { message: 'Logged in', user, ...token };
+    const jwtToken = await this.authService.login(user);
+    return { message: 'Logged in', user, ...jwtToken };
   }
 }
