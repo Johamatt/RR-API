@@ -12,13 +12,13 @@ https://github.com/Johamatt/RR-Android
 
 ## Download data
 
- 1. While [Overpass] API does not support exporting large datasets, this tool simplifies the process of exporting smaller GeoJSON data. To use this tool, you'll need to construct queries that specify nodes, as the app exclusively supports only Point data. Here is an example of a valid query:
+ 1. While [Overpass] API does not support exporting large datasets, this tool simplifies the process of exporting smaller GeoJSON data. To use this tool, you'll need to construct queries that specify nodes, as the app exclusively supports only Point data. Here is an example of a valid query for ~5000 nodes:
 
 ```
 [out:json][timeout:60];
-area[name="Helsinki"]->.helsinki;
+area["ISO3166-1"="FI"]->.finland;
 (
-  node["natural"~"peak|water|wood|beach|cliff|waterfall"](area.helsinki);
+  node["natural"~"peak|water|wood|beach|cliff|waterfall"](area.finland);
 );
 out body;
 >;
@@ -46,12 +46,21 @@ $ npm install
 2. **Set Up Google OAuth**:
    - Create a Google OAuth Client ID (Web application) from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
    - Add the Client ID to the `.env` file as `GOOGLE_CLIENT_ID=`.
+  - in Front-end, add this value to res/values/developer-config.xml
+  
+3. **Configure JWT token**:
+   - Define to`JWT_SECRET=` with any string value (random gen for prod).
 
-3. **Configure JWT Key**:
-   - Define to`JWT_KEY=` with any string value for now. This will be required for authentication purposes later.
-
-
-
+4. **Configure SSL**:
+    1. make self-signed certificate using openssl
+    2. make cert folder in root and paste cert.pem and key.pem
+    3. define .env values for paths:
+    ```
+    SSL_KEY_PATH=cert/key.pem
+    SSL_CERT_PATH=cert/cert.pem
+    ```
+    In front-end, add this cert.pem to res/raw -folder
+    
    [PostgreSQL]: <https://www.postgresql.org/download/>
    [Node]: <https://nodejs.org/en/download>
    [Overpass]: <https://overpass-turbo.eu/>
