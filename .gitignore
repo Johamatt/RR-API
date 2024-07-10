@@ -6,6 +6,9 @@
 # Data
 places.geojson
 
+# Cert
+/Cert
+
 # Logs
 logs
 *.log
