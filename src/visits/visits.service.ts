@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
 import { PlacesService } from '../places/places.service';
-import { ErrorDto } from '../dto/ErrorDto';
 
 @Injectable()
 export class VisitsService {
@@ -40,20 +39,10 @@ export class VisitsService {
     const place = await this.placeService.findById(placeId);
 
     if (!user) {
-      const errorMessage: ErrorDto = {
-        message: [`User with ID ${user_id} not found`],
-        error: HttpStatus.NOT_FOUND,
-        statusCode: 404,
-      };
-      throw new NotFoundException(errorMessage);
+      throw new NotFoundException(`User with ID ${user_id} not found`);
     }
     if (!place) {
-      const errorMessage: ErrorDto = {
-        message: [`Place with ID ${placeId} not found`],
-        error: HttpStatus.NOT_FOUND,
-        statusCode: 404,
-      };
-      throw new NotFoundException(errorMessage);
+      throw new NotFoundException(`Place with ID ${placeId} not found`);
     }
 
     const existingVisit = await this.visitRepository.findOne({
@@ -61,13 +50,7 @@ export class VisitsService {
     });
 
     if (existingVisit) {
-      const errorMessage: ErrorDto = {
-        message: [`You have already claimed this reward`],
-        error: HttpStatus.CONFLICT,
-        statusCode: 400,
-      };
-
-      throw new ConflictException(errorMessage);
+      throw new ConflictException(`You have already claimed this reward`);
     }
 
     const newVisit = new Visit();

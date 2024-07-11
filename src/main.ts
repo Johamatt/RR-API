@@ -28,6 +28,6 @@ async function bootstrap() {
   });
   httpApp.listen(80);
 
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(443, '0.0.0.0');
 }
 bootstrap();

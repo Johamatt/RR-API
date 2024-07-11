@@ -10,7 +10,6 @@ import { UsersService } from '../users/users.service';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/users.entity';
 import { LoginUserDto, RegisterUserDto } from '../dto/UserDto';
-import { ErrorDto } from '../dto/ErrorDto';
 import { AuthService } from './auth.service';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -63,12 +62,7 @@ export class AuthController {
       return { message: 'User created', user, ...jwtToken };
     }
     if (user) {
-      const errorMessage: ErrorDto = {
-        message: ['User with given email already exists'],
-        error: HttpStatus.CONFLICT,
-        statusCode: 400,
-      };
-      throw new ConflictException(errorMessage);
+      throw new ConflictException('User with given email already exists');
     }
   }
 
@@ -78,9 +72,6 @@ export class AuthController {
 
     let user = await this.usersService.findByEmailAndPassword(email, password);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
 
     const jwtToken = await this.authService.login(user);
     return { message: 'Logged in', user, ...jwtToken };

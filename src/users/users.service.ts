@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   HttpException,
-  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,7 +13,6 @@ import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import { compare } from 'bcrypt';
 import { RegisterUserDto } from '../dto/UserDto';
-import { ErrorDto } from '../dto/ErrorDto';
 import { UpdateCountryDto } from '../dto/UpdateCountryDto';
 
 @Injectable()
@@ -37,12 +35,7 @@ export class UsersService {
       const user = await this.usersRepository.findOne({ where: { email } });
       return user;
     } catch (error) {
-      const errorMessage: ErrorDto = {
-        message: ['Failed to find Email'],
-        error: HttpStatus.INTERNAL_SERVER_ERROR,
-        statusCode: 400,
-      };
-      throw new InternalServerErrorException(errorMessage);
+      throw new InternalServerErrorException('Failed to find Email');
     }
   }
 
@@ -56,12 +49,7 @@ export class UsersService {
 
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
-      const errorMessage: ErrorDto = {
-        message: ['User already exists'],
-        error: HttpStatus.CONFLICT,
-        statusCode: 400,
-      };
-      throw new ConflictException(errorMessage);
+      throw new ConflictException('User already exists');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -81,35 +69,22 @@ export class UsersService {
       const user = await this.usersRepository.findOne({ where: { email } });
 
       if (!user) {
-        const errorMessage: ErrorDto = {
-          message: ['User not found or invalid credentials'],
-          error: HttpStatus.BAD_REQUEST,
-          statusCode: HttpStatus.BAD_REQUEST,
-        };
-        throw new BadRequestException(errorMessage);
+        throw new BadRequestException('User not found or invalid credentials');
       }
 
       const passwordMatch = await compare(password, user.password);
       if (passwordMatch) {
         return user;
       } else {
-        const errorMessage: ErrorDto = {
-          message: ['User not found or invalid credentials'],
-          error: HttpStatus.UNAUTHORIZED,
-          statusCode: HttpStatus.UNAUTHORIZED,
-        };
-        throw new UnauthorizedException(errorMessage);
+        throw new UnauthorizedException(
+          'User not found or invalid credentials',
+        );
       }
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       } else {
-        const errorMessage: ErrorDto = {
-          message: ['Internal server error'],
-          error: HttpStatus.INTERNAL_SERVER_ERROR,
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        };
-        throw new InternalServerErrorException(errorMessage);
+        throw new InternalServerErrorException('Internal server error');
       }
     }
   }
@@ -120,12 +95,7 @@ export class UsersService {
   ): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { user_id } });
     if (!user) {
-      const errorMessage: ErrorDto = {
-        message: [`User with ID ${user_id} not found`],
-        error: HttpStatus.BAD_REQUEST,
-        statusCode: HttpStatus.BAD_REQUEST,
-      };
-      throw new NotFoundException(errorMessage);
+      throw new NotFoundException(`User with ID ${user_id} not found`);
     }
     user.country = updateCountryDto.country;
     return this.usersRepository.save(user);
