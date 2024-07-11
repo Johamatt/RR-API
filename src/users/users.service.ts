@@ -94,10 +94,12 @@ export class UsersService {
     updateCountryDto: UpdateCountryDto,
   ): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { user_id } });
+
     if (!user) {
       throw new NotFoundException(`User with ID ${user_id} not found`);
     }
     user.country = updateCountryDto.country;
+
     return this.usersRepository.save(user);
   }
 }

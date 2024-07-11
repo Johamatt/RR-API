@@ -17,16 +17,8 @@ export class VisitsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createVisitDto: CreateVisitDto): Promise<Visit> {
-    try {
-      const validatedDto =
-        await this.visitsService.validateCreateVisitDto(createVisitDto);
-      return this.visitsService.createVisit(validatedDto);
-    } catch (error) {
-      throw new BadRequestException({
-        message: error,
-        error: 'Bad Request',
-        statusCode: 400,
-      });
-    }
+    const validatedDto =
+      await this.visitsService.validateCreateVisitDto(createVisitDto);
+    return this.visitsService.createVisit(validatedDto);
   }
 }

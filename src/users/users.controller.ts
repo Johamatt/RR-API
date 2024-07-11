@@ -18,28 +18,30 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id/country')
+  @Patch('country')
   async updateCountry(
     @Request() req,
-    @Param('id') id: number,
     @Body() updateCountryDto: UpdateCountryDto,
   ): Promise<User> {
-    if (req.user.user_id !== +id) {
+    const id = updateCountryDto.user_id;
+
+    if (req.user.user_id !== id) {
       throw new ForbiddenException('You can only edit your own user');
     }
+
     return this.usersService.updateCountry(id, updateCountryDto);
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Put(':id')
-  // async updateUser(
-  //   @Request() req,
-  //   @Param('id') id: number,
-  //   @Body() updateUserDto: any,
-  // ): Promise<User> {
-  //   if (req.user.user_id !== +id) {
-  //     throw new ForbiddenException('You can only edit your own user.');
-  //   }
-  //   return this.usersService.updateUser(id, updateUserDto);
-  // }
 }
+
+// @UseGuards(JwtAuthGuard)
+// @Put(':id')
+// async updateUser(
+//   @Request() req,
+//   @Param('id') id: number,
+//   @Body() updateUserDto: any,
+// ): Promise<User> {
+//   if (req.user.user_id !== +id) {
+//     throw new ForbiddenException('You can only edit your own user.');
+//   }
+//   return this.usersService.updateUser(id, updateUserDto);
+// }
