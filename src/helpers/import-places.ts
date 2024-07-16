@@ -59,7 +59,6 @@ const main = async () => {
             type: 'Point',
             coordinates: [longitude, latitude],
           },
-          points: 0,
           country: 'Norway',
         };
 

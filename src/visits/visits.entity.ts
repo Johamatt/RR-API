@@ -19,8 +19,6 @@ export class Visit {
   @ManyToOne(() => Place, (place) => place.visits)
   place: Place;
 
-  @Column()
-  points_awarded: number;
 
   @CreateDateColumn()
   created_at: Date;

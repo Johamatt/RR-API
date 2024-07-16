@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { Point } from 'geojson';
 
 export class CheckProximityDto {
   @IsNotEmpty()

@@ -5,10 +5,6 @@ export class CreateVisitDto {
   @IsNotEmpty()
   user_id: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  points_awarded: number;
-
   @IsNotEmpty()
   placeId: string;
 }

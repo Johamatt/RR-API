@@ -23,7 +23,6 @@ export class PlacesService {
     place.name = body.name;
     place.description = body.description;
     place.coordinates = body.coordinates;
-    place.points = body.points;
 
     return this.repository.save(place);
   }
@@ -37,7 +36,6 @@ export class PlacesService {
         place_id: place.place_id,
         name: place.name,
         description: place.description,
-        points: place.points,
         created_at: place.created_at,
         updated_at: place.updated_at,
       },
@@ -58,7 +56,6 @@ export class PlacesService {
         place_id: place.place_id,
         name: place.name,
         description: place.description,
-        points: place.points,
         created_at: place.created_at,
         updated_at: place.updated_at,
       },

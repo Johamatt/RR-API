@@ -27,9 +27,6 @@ export class Place {
   @Column('geometry', { spatialFeatureType: 'Point', srid: 4326 })
   coordinates: Point;
 
-  @Column()
-  points: number;
-
   @CreateDateColumn()
   created_at: Date;
 

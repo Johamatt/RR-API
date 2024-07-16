@@ -24,10 +24,6 @@ export class CreatePlaceDto {
   @Type(() => Point)
   public coordinates: Point;
 
-  @IsNotEmpty()
-  @IsNumber()
-  public points: number;
-
   @IsString()
   @IsNotEmpty()
   public country: string;

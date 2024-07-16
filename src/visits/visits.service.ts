@@ -33,7 +33,7 @@ export class VisitsService {
   }
 
   async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
-    const { user_id, placeId, points_awarded } = createVisitDto;
+    const { user_id, placeId } = createVisitDto;
 
     const user = await this.userService.findById(user_id);
     const place = await this.placeService.findById(placeId);
@@ -56,7 +56,6 @@ export class VisitsService {
     const newVisit = new Visit();
     newVisit.user = user;
     newVisit.place = place;
-    newVisit.points_awarded = points_awarded;
 
     return this.visitRepository.save(newVisit);
   }
