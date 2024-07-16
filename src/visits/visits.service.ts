@@ -59,4 +59,17 @@ export class VisitsService {
 
     return this.visitRepository.save(newVisit);
   }
+
+  async getVisitsByUser(userId: number): Promise<Partial<Visit>[]> {
+    const visits = await this.visitRepository.find({
+      where: { user: { user_id: userId } },
+      relations: ['user', 'place'],
+    });
+
+    // Manually exclude the `user` field from each visit
+    return visits.map(visit => {
+      const { user, ...visitWithoutUser } = visit;
+      return visitWithoutUser;
+    });
+  }
 }
