@@ -9,7 +9,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateCountryDto } from 'src/dto/UpdateCountryDto';
+import { UpdateCountryDto } from '../dto/UpdateCountryDto';
 import { User } from './users.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 

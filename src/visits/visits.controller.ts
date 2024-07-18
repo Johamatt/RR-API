@@ -12,7 +12,7 @@ import {
 import { CreateVisitDto } from './CreateVisitDto';
 import { Visit } from './visits.entity';
 import { VisitsService } from './visits.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('visits')
 export class VisitsController {

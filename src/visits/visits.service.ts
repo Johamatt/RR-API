@@ -46,7 +46,7 @@ export class VisitsService {
     }
 
     const existingVisit = await this.visitRepository.findOne({
-      where: { user: { user_id }, place: { place_id: placeId } },
+      where: { user: { user_id }, place: { placeId: placeId } },
     });
 
     if (existingVisit) {
@@ -66,8 +66,7 @@ export class VisitsService {
       relations: ['user', 'place'],
     });
 
-    // Manually exclude the `user` field from each visit
-    return visits.map(visit => {
+    return visits.map((visit) => {
       const { user, ...visitWithoutUser } = visit;
       return visitWithoutUser;
     });

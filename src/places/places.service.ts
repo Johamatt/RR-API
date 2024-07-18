@@ -12,17 +12,16 @@ export class PlacesService {
     private readonly repository: Repository<Place>,
   ) {}
 
-  public findById(place_id: string): Promise<Place> {
-    return this.repository.findOne({ where: { place_id } });
+  public findById(placeId: string): Promise<Place> {
+    return this.repository.findOne({ where: { placeId } });
   }
 
-  
   public createPlace(body: CreatePlaceDto): Promise<Place> {
     const place: Place = new Place();
 
-    place.name = body.name;
-    place.description = body.description;
-    place.coordinates = body.coordinates;
+    place.nameFi = body.nameFi;
+    place.lisätieto = body.lisätieto;
+    place.pointCoordinates = body.pointCoordinates;
 
     return this.repository.save(place);
   }
@@ -31,13 +30,11 @@ export class PlacesService {
     const places = await this.repository.find();
     const features = places.map((place) => ({
       type: 'Feature',
-      geometry: place.coordinates,
+      geometry: place.pointCoordinates,
       properties: {
-        place_id: place.place_id,
-        name: place.name,
-        description: place.description,
-        created_at: place.created_at,
-        updated_at: place.updated_at,
+        placeId: place.placeId,
+        name: place.nameFi,
+        lisätieto: place.lisätieto,
       },
     }));
 
@@ -47,19 +44,20 @@ export class PlacesService {
     };
   }
 
-  public async findByCountry(country: string): Promise<GeoJsonDto> {
+  public async findPointsByCountry(country: string): Promise<GeoJsonDto> {
     const places = await this.repository.find({ where: { country } });
-    const features = places.map((place) => ({
-      type: 'Feature',
-      geometry: place.coordinates,
-      properties: {
-        place_id: place.place_id,
-        name: place.name,
-        description: place.description,
-        created_at: place.created_at,
-        updated_at: place.updated_at,
-      },
-    }));
+
+    const features = places
+      .filter((place) => place.pointCoordinates)
+      .map((place) => ({
+        type: 'Feature',
+        geometry: place.pointCoordinates,
+        properties: {
+          placeId: place.placeId,
+          nameFi: place.nameFi,
+          lisätieto: place.lisätieto,
+        },
+      }));
 
     return {
       type: 'FeatureCollection',

@@ -43,7 +43,7 @@ export class PlacesController {
   public findByCountry(
     @Param('country', new ParseEnumPipe(Country)) country: Country,
   ): Promise<GeoJsonDto> {
-    return this.service.findByCountry(country);
+    return this.service.findPointsByCountry(country);
   }
 
   @UseGuards(JwtAuthGuard)
