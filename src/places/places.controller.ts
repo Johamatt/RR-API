@@ -27,18 +27,6 @@ export class PlacesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post()
-  public createPlace(@Body() body: CreatePlaceDto): Promise<Place> {
-    return this.service.createPlace(body);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  public findAll(): Promise<GeoJsonDto> {
-    return this.service.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Get('country/:country')
   public findByCountry(
     @Param('country', new ParseEnumPipe(Country)) country: Country,
