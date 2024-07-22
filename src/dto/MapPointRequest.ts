@@ -7,4 +7,4 @@ interface Properties {
   liikuntapaikkaTyyppi: string;
 }
 
-export type MapPointsByCountryRequest = Feature<Point, Properties>[];
+export type GeoJsonPointsByCountryRequest = Feature<Point, Properties>[];
