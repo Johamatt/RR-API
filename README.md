@@ -12,21 +12,12 @@ https://github.com/Johamatt/RR-Android
 
 ## Download data
 
- 1. While [Overpass] API does not support exporting large datasets, this tool simplifies the process of exporting smaller GeoJSON data. To use this tool, you'll need to construct queries that specify nodes, as the app exclusively supports only Point data. Here is an example of a valid query for ~5000 nodes:
-
-```
-[out:json][timeout:60];
-area["ISO3166-1"="FI"]->.finland;
-(
-  node["natural"~"peak|water|wood|beach|cliff|waterfall"](area.finland);
-);
-out body;
->;
-out skel qt;
-```
-
-
-2. Export results as places.geojson file and add it in project root folder
+1. Download data from https://www.lipas.fi/liikuntapaikat
+2. Click left bottom corner icon (Luo excel raportti hakutuloksista)
+3. Add all quick selections (Pikavalinnat)
+4. Select GeoJSON from dropdown
+5. Save it as places.geojson file and add it in project root folder
+6. Run script in helpers -folder.
 
 ---
 
