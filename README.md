@@ -1,5 +1,5 @@
 # Geo API with NestJS & PostGIS
-This application enables users to find the location information of places by utilizing spatial location search. The data can be retrieved for example, from [Overpass].
+This application enables users to find the location information of sport places in Finland by utilizing spatial location search.
 
 Android UI in progress here:
 https://github.com/Johamatt/RR-Android
@@ -7,6 +7,7 @@ https://github.com/Johamatt/RR-Android
 ## Prerequisites
 - [PostgreSQL] running locally initialized with [PostGIS] -extension
 - [Node] installed on your machine
+- [OpenSSL] for self signed certificate
 
 ---
 
@@ -43,7 +44,7 @@ $ npm install
    - Define to`JWT_SECRET=` with any string value (random gen for prod).
 
 4. **Configure SSL**:
-    1. make self-signed certificate using openssl
+    1. make self-signed certificate using [OpenSSL]
     2. make cert folder in root and paste cert.pem and key.pem
     3. define .env values for paths:
     ```
@@ -54,5 +55,5 @@ $ npm install
     
    [PostgreSQL]: <https://www.postgresql.org/download/>
    [Node]: <https://nodejs.org/en/download>
-   [Overpass]: <https://overpass-turbo.eu/>
    [PostGIS]: <https://postgis.net/documentation/getting_started/#:~:text=CREATE%20EXTENSION%20postgis%3B>
+   [OpenSSL]: <https://www.openssl.org/source/>

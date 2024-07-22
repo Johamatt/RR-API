@@ -75,7 +75,7 @@ const main = async () => {
     const app = await NestFactory.createApplicationContext(AppModule);
     const placeRepository = appDataSource.getRepository(Place);
 
-    const geojsonFilePath = path.resolve(__dirname, '../../places4.geojson');
+    const geojsonFilePath = path.resolve(__dirname, '../../places.geojson');
     const data = fs.readFileSync(geojsonFilePath, 'utf8');
     const geojson = JSON.parse(data);
 
