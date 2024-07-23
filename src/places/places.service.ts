@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Place } from './places.entity';
 import { GeoJsonDto } from '../dto/GeoJsonDto';
-import { GeoJsonPointsByCountryRequest } from '../dto/MapPointRequest';
+import { GeoJsonPointsRequest } from '../dto/MapPointRequest';
 
 @Injectable()
 export class PlacesService {
@@ -16,10 +16,10 @@ export class PlacesService {
     return this.repository.findOne({ where: { placeId } });
   }
 
-  public async GeoJsonPointsByCountry(country: string): Promise<GeoJsonDto> {
-    const places = await this.repository.find({ where: { country } });
+  public async GeoJsonPoints(): Promise<GeoJsonDto> {
+    const places = await this.repository.find();
 
-    const features: GeoJsonPointsByCountryRequest = places
+    const features: GeoJsonPointsRequest = places
       .filter((place) => place.pointCoordinates)
       .map((place) => ({
         type: 'Feature',
