@@ -1,10 +1,10 @@
 import { Feature, Point } from 'geojson';
 
 interface Properties {
-  placeId: string;
-  nameFi: string;
+  place_id: string;
+  name_fi: string;
   katuosoite: string;
-  liikuntapaikkaTyyppi: string;
+  liikuntapaikkatyyppi: string;
 }
 
 export type GeoJsonPointsRequest = Feature<Point, Properties>[];

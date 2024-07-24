@@ -6,5 +6,5 @@ export class CreateVisitDto {
   user_id: number;
 
   @IsNotEmpty()
-  placeId: string;
+  place_id: string;
 }

@@ -9,6 +9,8 @@ import { Visit } from './visits/visits.entity';
 import { PlacesModule } from './places/places.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { Address } from './address/address.entity';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import { UsersModule } from './users/users.module';
         username: configService.get<string>('DATABASE_USER'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        entities: [User, Place, Visit],
+        entities: [User, Place, Visit, Address],
         synchronize: true,
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
     }),

@@ -7,14 +7,17 @@ import {
   Point,
   LineString,
   Index,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 import { Visit } from '../visits/visits.entity';
+import { Address } from '../address/address.entity';
 
 @Entity()
 export class Place {
   @PrimaryColumn()
-  placeId: string;
+  place_id: string;
 
   @Index({ spatial: true })
   @Column({
@@ -23,7 +26,7 @@ export class Place {
     spatialFeatureType: 'Point',
     srid: 4326,
   })
-  pointCoordinates: Point;
+  point_coordinates: Point;
 
   @Index({ spatial: true })
   @Column({
@@ -32,7 +35,7 @@ export class Place {
     spatialFeatureType: 'Polygon',
     srid: 4326,
   })
-  polygonCoordinates: Polygon;
+  polygon_coordinates: Polygon;
 
   @Index({ spatial: true })
   @Column({
@@ -41,83 +44,42 @@ export class Place {
     spatialFeatureType: 'LineString',
     srid: 4326,
   })
-  linestringCoordinates: LineString;
+  linestring_coordinates: LineString;
 
   @OneToMany(() => Visit, (visit) => visit.place)
   visits: Visit[];
 
-  @Column()
-  country: string;
+  @OneToOne(() => Address)
+  @JoinColumn({ name: 'address_id' })
+  address: Address;
 
   @Column()
-  nameFi: string;
+  name_fi: string;
 
   @Column()
-  public liikuntapaikkaTyyppi: string;
+  liikuntapaikkatyyppi: string;
 
   @Column()
-  liikuntapaikkatyypinAlaryhmä: string;
+  liikuntapaikkatyypinalaryhmä: string;
 
   @Column()
-  liikuntapaikkatyypinPääryhmä: string;
-
-  @Column()
-  katuosoite: string;
-
-  @Column()
-  postinumero: string;
+  liikuntapaikkatyypinpääryhmä: string;
 
   @Column({ nullable: true })
-  www?: string;
-
-  @Column({ nullable: true })
-  kunta?: string;
-
-  @Column({ nullable: true })
-  kuntaosa?: string;
-
-  @Column({ type: 'float', nullable: true })
-  liikuntapintaalaM2?: number;
-
-  @Column({ nullable: true })
-  postitoimipaikka?: string;
-
-  @Column({ nullable: true })
-  lisätieto?: string;
-
-  @Column({ nullable: true })
-  muokattuViimeksi?: string;
-
-  @Column({ type: 'float', nullable: true })
-  kentänLeveysM?: number;
-
-  @Column({ type: 'float', nullable: true })
-  kentänPituusM?: number;
-
-  @Column({ nullable: true })
-  puhelinnumero?: string;
-
-  @Column({ nullable: true })
-  pintamateriaaliLisätieto?: string;
+  muokattu_viimeksi?: string;
 
   @Column({ nullable: true })
   markkinointinimi?: string;
 
   @Column({ nullable: true })
-  omistaja?: string;
+  lisätieto?: string;
 
   @Column({ nullable: true })
-  maakunta?: string;
+  www?: string;
 
   @Column({ nullable: true })
-  pintamateriaali?: string;
+  puhelinnumero?: string;
 
   @Column({ nullable: true })
   sähköposti?: string;
-
-  @Column({ nullable: true })
-  peruskorjausvuodet?: string;
-
-  @Column({ nullable: true })
-  aviAlue?: string;
 }

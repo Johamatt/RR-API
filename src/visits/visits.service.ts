@@ -33,20 +33,20 @@ export class VisitsService {
   }
 
   async createVisit(createVisitDto: CreateVisitDto): Promise<Visit> {
-    const { user_id, placeId } = createVisitDto;
+    const { user_id, place_id } = createVisitDto;
 
     const user = await this.userService.findById(user_id);
-    const place = await this.placeService.findById(placeId);
+    const place = await this.placeService.findById(place_id);
 
     if (!user) {
       throw new NotFoundException(`User with ID ${user_id} not found`);
     }
     if (!place) {
-      throw new NotFoundException(`Place with ID ${placeId} not found`);
+      throw new NotFoundException(`Place with ID ${place_id} not found`);
     }
 
     const existingVisit = await this.visitRepository.findOne({
-      where: { user: { user_id }, place: { placeId: placeId } },
+      where: { user: { user_id }, place: { place_id: place_id } },
     });
 
     if (existingVisit) {

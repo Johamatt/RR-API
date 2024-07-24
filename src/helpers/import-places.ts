@@ -9,30 +9,11 @@ import { CreatePlaceDto } from '../dto/CreatePlaceDto';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
+import { AddressDto } from '../dto/AddressDto';
+import { Address } from '../address/address.entity';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 dotenv.config({ path: '../../.env' });
-
-const databaseHost = process.env.DATABASE_HOST;
-const databasePort = Number(process.env.DATABASE_PORT);
-const databaseUser = process.env.DATABASE_USER;
-const databasePassword = process.env.DATABASE_PASSWORD;
-const databaseName = process.env.DATABASE_NAME;
-
-console.log('Database Host:', databaseHost);
-console.log('Database Port:', databasePort);
-console.log('Database User:', databaseUser);
-console.log('Database Name:', databaseName);
-
-const appDataSource = new DataSource({
-  type: 'postgres',
-  host: databaseHost,
-  port: databasePort,
-  username: databaseUser,
-  password: databasePassword,
-  database: databaseName,
-  synchronize: true,
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-});
 
 const skipCategory = [
   'Erämaa-alue',
@@ -67,6 +48,29 @@ const skipCategory = [
   'Virkistysmetsä',
 ];
 
+const databaseHost = process.env.DATABASE_HOST;
+const databasePort = Number(process.env.DATABASE_PORT);
+const databaseUser = process.env.DATABASE_USER;
+const databasePassword = process.env.DATABASE_PASSWORD;
+const databaseName = process.env.DATABASE_NAME;
+
+console.log('Database Host:', databaseHost);
+console.log('Database Port:', databasePort);
+console.log('Database User:', databaseUser);
+console.log('Database Name:', databaseName);
+
+const appDataSource = new DataSource({
+  type: 'postgres',
+  host: databaseHost,
+  port: databasePort,
+  username: databaseUser,
+  password: databasePassword,
+  database: databaseName,
+  synchronize: true,
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  namingStrategy: new SnakeNamingStrategy(),
+});
+
 const main = async () => {
   try {
     console.time('main');
@@ -74,8 +78,9 @@ const main = async () => {
 
     const app = await NestFactory.createApplicationContext(AppModule);
     const placeRepository = appDataSource.getRepository(Place);
+    const addressRepository = appDataSource.getRepository(Address);
 
-    const geojsonFilePath = path.resolve(__dirname, '../../places.geojson');
+    const geojsonFilePath = path.resolve(__dirname, '../../places4.geojson');
     const data = fs.readFileSync(geojsonFilePath, 'utf8');
     const geojson = JSON.parse(data);
 
@@ -97,57 +102,59 @@ const main = async () => {
         continue;
       }
 
-      let createPlaceDto: CreatePlaceDto = {
-        placeId: properties['Lipas-id'],
-        nameFi: properties['Nimi suomeksi'],
-        liikuntapaikkaTyyppi: properties['Liikuntapaikkatyyppi'],
-        liikuntapaikkatyypinAlaryhmä:
-          properties['Liikuntapaikkatyypin alaryhmä'],
-        liikuntapaikkatyypinPääryhmä:
-          properties['Liikuntapaikkatyypin pääryhmä'],
-        www: properties['WWW'],
-        country: 'FI',
+      const addressDto: AddressDto = {
         katuosoite: properties['Katuosoite'],
         kunta: properties['Kunta'],
         kuntaosa: properties['Kuntaosa'],
-        liikuntapintaalaM2: properties['Liikuntapinta-ala m2'],
         postitoimipaikka: properties['Postitoimipaikka'],
-        lisätieto: properties['Lisätieto'],
-        muokattuViimeksi: properties['Muokattu viimeksi'],
-        kentänLeveysM: properties['Kentän leveys m'],
         postinumero: properties['Postinumero'],
-        kentänPituusM: properties['Kentän pituus m'],
-        puhelinnumero: properties['Puhelinnumero'],
-        pintamateriaaliLisätieto: properties['Pintamateriaali lisätieto'],
-        markkinointinimi: properties['Markkinointinimi'],
-        omistaja: properties['Omistaja'],
         maakunta: properties['Maakunta'],
-        pintamateriaali: properties['Pintamateriaali'],
+      };
+
+      const address = plainToClass(Address, addressDto);
+
+      const addressErrors = await validate(address);
+      if (addressErrors.length > 0) {
+        console.error('Address validation errors:', addressErrors);
+        continue;
+      }
+
+      let createPlaceDto: CreatePlaceDto = {
+        address: addressDto,
+        place_id: properties['Lipas-id'].toString(),
+        name_fi: properties['Nimi suomeksi'],
+        liikuntapaikkatyyppi: properties['Liikuntapaikkatyyppi'],
+        liikuntapaikkatyypinalaryhmä:
+          properties['Liikuntapaikkatyypin alaryhmä'],
+        liikuntapaikkatyypinpääryhmä:
+          properties['Liikuntapaikkatyypin pääryhmä'],
+        www: properties['WWW'],
+        lisätieto: properties['Lisätieto'],
+        muokattu_viimeksi: properties['Muokattu viimeksi'],
+        puhelinnumero: properties['Puhelinnumero'],
+        markkinointinimi: properties['Markkinointinimi'],
         sähköposti: properties['Sähköposti'],
-        peruskorjausvuodet: properties['Peruskorjausvuodet'],
-        aviAlue: properties['AVI-alue'],
-        pointCoordinates: null,
-        polygonCoordinates: null,
-        linestringCoordinates: null,
+        point_coordinates: null,
+        polygon_coordinates: null,
+        linestring_coordinates: null,
       };
 
       if (type === 'Point') {
-        createPlaceDto.pointCoordinates = {
+        createPlaceDto.point_coordinates = {
           type: 'Point',
           coordinates: coordinates,
         };
       } else if (type === 'Polygon') {
-        createPlaceDto.polygonCoordinates = {
+        createPlaceDto.polygon_coordinates = {
           type: 'Polygon',
           coordinates: coordinates,
         };
       } else if (type === 'LineString') {
-        let simplifiedCoordinates = coordinates.map((coord) => {
-          // Filter out the Z dimension
-          return coord.slice(0, 2);
-        });
+        let simplifiedCoordinates = coordinates.map((coord) =>
+          coord.slice(0, 2),
+        );
 
-        createPlaceDto.linestringCoordinates = {
+        createPlaceDto.linestring_coordinates = {
           type: 'LineString',
           coordinates: simplifiedCoordinates,
         };
@@ -159,33 +166,56 @@ const main = async () => {
       const errors = await validate(
         plainToClass(CreatePlaceDto, createPlaceDto),
       );
+
       if (errors.length > 0) {
         console.error('Validation errors:', errors);
-        continue;
+        process.exit(1);
       }
       const place = plainToClass(Place, createPlaceDto);
 
-      // TODO this overdrives other coordinates
       try {
-        const existingPlace = await placeRepository.findOneBy({
-          placeId: place.placeId,
+        const existingPlace = await placeRepository.findOne({
+          where: { place_id: place.place_id },
+          relations: ['address'],
         });
+
         if (existingPlace) {
-          await placeRepository.update({ placeId: place.placeId }, place);
+          const updateFields: Partial<Place> = {};
+
+          if (!existingPlace.point_coordinates && place.point_coordinates) {
+            updateFields.point_coordinates = place.point_coordinates;
+          }
+          if (!existingPlace.polygon_coordinates && place.polygon_coordinates) {
+            updateFields.polygon_coordinates = place.polygon_coordinates;
+          }
+          if (
+            !existingPlace.linestring_coordinates &&
+            place.linestring_coordinates
+          ) {
+            updateFields.linestring_coordinates = place.linestring_coordinates;
+          }
+
+          if (Object.keys(updateFields).length > 0) {
+            await placeRepository.update(
+              { place_id: place.place_id },
+              updateFields,
+            );
+          }
         } else {
+          await addressRepository.save(address);
+          place.address = address;
           await placeRepository.save(place);
         }
       } catch (err) {
         console.error('Error saving place:', err);
-        continue;
+        process.exit(1);
       }
-
-      console.log(createPlaceDto);
     }
 
     console.timeEnd('main');
   } catch (err) {
     console.error('Error:', err);
+    process.exit(1);
   }
 };
 

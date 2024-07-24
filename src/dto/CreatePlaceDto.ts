@@ -1,62 +1,53 @@
 import {
-  IsEmail,
-  IsNotEmpty,
   IsString,
-  IsNumber,
-  ValidateNested,
+  IsNotEmpty,
   IsOptional,
+  IsEmail,
+  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
 import { Point, Polygon, LineString } from 'geojson';
+import { AddressDto } from './AddressDto';
 
 export class CreatePlaceDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  public placeId: number;
+  public place_id: string;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => Point)
-  public pointCoordinates?: Point;
+  public point_coordinates?: Point;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => Polygon)
-  public polygonCoordinates?: Polygon;
+  public polygon_coordinates?: Polygon;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => LineString)
-  public linestringCoordinates?: LineString;
+  public linestring_coordinates?: LineString;
 
   @IsString()
   @IsNotEmpty()
-  public nameFi: string;
+  public name_fi: string;
 
   @IsString()
   @IsNotEmpty()
-  public country: string;
+  public liikuntapaikkatyyppi: string;
 
   @IsString()
   @IsNotEmpty()
-  public liikuntapaikkaTyyppi: string;
+  public liikuntapaikkatyypinalaryhmä: string;
 
   @IsString()
   @IsNotEmpty()
-  public liikuntapaikkatyypinAlaryhmä: string;
+  public liikuntapaikkatyypinpääryhmä: string;
 
-  @IsString()
-  @IsNotEmpty()
-  public liikuntapaikkatyypinPääryhmä: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public katuosoite: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public postinumero: string;
+  @ValidateNested()
+  @Type(() => AddressDto)
+  public address: AddressDto;
 
   @IsString()
   @IsOptional()
@@ -64,35 +55,11 @@ export class CreatePlaceDto {
 
   @IsString()
   @IsOptional()
-  public kunta?: string;
-
-  @IsString()
-  @IsOptional()
-  public kuntaosa?: string;
-
-  @IsNumber()
-  @IsOptional()
-  public liikuntapintaalaM2?: number;
-
-  @IsString()
-  @IsOptional()
-  public postitoimipaikka?: string;
-
-  @IsString()
-  @IsOptional()
   public lisätieto?: string;
 
   @IsString()
   @IsOptional()
-  public muokattuViimeksi?: string;
-
-  @IsNumber()
-  @IsOptional()
-  public kentänLeveysM?: number;
-
-  @IsNumber()
-  @IsOptional()
-  public kentänPituusM?: number;
+  public muokattu_viimeksi?: string;
 
   @IsString()
   @IsOptional()
@@ -100,33 +67,8 @@ export class CreatePlaceDto {
 
   @IsString()
   @IsOptional()
-  public pintamateriaaliLisätieto?: string;
-
-  @IsString()
-  @IsOptional()
   public markkinointinimi?: string;
 
-  @IsString()
-  @IsOptional()
-  public omistaja?: string;
-
-  @IsString()
-  @IsOptional()
-  public maakunta?: string;
-
-  @IsString()
-  @IsOptional()
-  public pintamateriaali?: string;
-
-  @IsEmail()
   @IsOptional()
   public sähköposti?: string;
-
-  @IsString()
-  @IsOptional()
-  public peruskorjausvuodet?: string;
-
-  @IsString()
-  @IsOptional()
-  public aviAlue?: string;
 }
