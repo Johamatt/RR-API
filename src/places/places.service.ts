@@ -20,13 +20,21 @@ export class PlacesService {
   }
 
   public async GeoJsonPoints(): Promise<GeoJsonDto> {
-    const places = await this.repository.find({
-      relations: ['address'],
-    });
+    try {
+      const places = await this.repository
+        .createQueryBuilder('place')
+        .leftJoinAndSelect('place.address', 'address')
+        .where('place.point_coordinates IS NOT NULL')
+        .select([
+          'place.point_coordinates',
+          'place.place_id',
+          'place.name_fi',
+          'address.katuosoite',
+          'place.liikuntapaikkatyyppi',
+        ])
+        .getMany();
 
-    const features: GeoJsonPointsRequest = places
-      .filter((place) => place.point_coordinates)
-      .map((place) => ({
+      const features: GeoJsonPointsRequest = places.map((place) => ({
         type: 'Feature',
         geometry: place.point_coordinates,
         properties: {
@@ -37,12 +45,52 @@ export class PlacesService {
         },
       }));
 
-    console.log(features[0]);
-    console.log(features[1]);
+      return {
+        type: 'FeatureCollection',
+        features,
+      };
+    } catch (error) {
+      throw new Error('An error occurred while retrieving GeoJSON points.');
+    }
+  }
 
-    return {
-      type: 'FeatureCollection',
-      features,
-    };
+  public async findByliikuntapaikkatyypit(
+    liikuntapaikkatyyppi: string[],
+  ): Promise<GeoJsonDto> {
+    try {
+      const places = await this.repository
+        .createQueryBuilder('place')
+        .leftJoinAndSelect('place.address', 'address')
+        .where('place.liikuntapaikkatyyppi IN (:...liikuntapaikkatyyppi)', {
+          liikuntapaikkatyyppi,
+        })
+        .andWhere('place.point_coordinates IS NOT NULL')
+        .select([
+          'place.point_coordinates',
+          'place.place_id',
+          'place.name_fi',
+          'address.katuosoite',
+          'place.liikuntapaikkatyyppi',
+        ])
+        .getMany();
+
+      const features: GeoJsonPointsRequest = places.map((place) => ({
+        type: 'Feature',
+        geometry: place.point_coordinates,
+        properties: {
+          place_id: place.place_id,
+          name_fi: place.name_fi,
+          katuosoite: place.address.katuosoite,
+          liikuntapaikkatyyppi: place.liikuntapaikkatyyppi,
+        },
+      }));
+
+      return {
+        type: 'FeatureCollection',
+        features,
+      };
+    } catch (error) {
+      throw new Error('An error occurred while retrieving GeoJSON points.');
+    }
   }
 }

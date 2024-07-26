@@ -56,6 +56,7 @@ export class Place {
   @Column()
   name_fi: string;
 
+  @Index()
   @Column()
   liikuntapaikkatyyppi: string;
 
