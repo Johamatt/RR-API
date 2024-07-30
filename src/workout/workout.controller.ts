@@ -8,40 +8,40 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { CreateVisitDto } from './CreateVisitDto';
-import { Visit } from './visits.entity';
-import { VisitsService } from './visits.service';
+import { Workout } from './workout.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateWorkoutDto } from '../dto/CreateWorkoutDto';
+import { WorkoutService } from './workout.service';
 
-@Controller('visits')
-export class VisitsController {
-  constructor(private readonly visitsService: VisitsService) {}
+@Controller('workouts')
+export class WorkoutController {
+  constructor(private readonly workoutService: WorkoutService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Body() createVisitDto: CreateVisitDto,
+    @Body() createWorkoutDto: CreateWorkoutDto,
     @Request() req,
-  ): Promise<Visit> {
-    if (req.user.user_id !== createVisitDto.user_id) {
+  ): Promise<Workout> {
+    if (req.user.user_id !== createWorkoutDto.user_id) {
       throw new ForbiddenException('You can only edit your own user');
     }
     const validatedDto =
-      await this.visitsService.validateCreateVisitDto(createVisitDto);
-    return this.visitsService.createVisit(validatedDto);
+      await this.workoutService.validateCreateWorkoutDto(createWorkoutDto);
+    return this.workoutService.createWorkout(validatedDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getVisitsByUser(
+  async getWorkoutsByUser(
     @Request() req,
     @Query('user_id') user_id: string,
-  ): Promise<Partial<Visit>[]> {
+  ): Promise<Partial<Workout>[]> {
     const userIdFromReq = String(req.user.user_id);
     if (userIdFromReq !== user_id) {
       throw new ForbiddenException('You can only edit your own user');
     }
     const userIdNumber = parseInt(user_id, 10);
-    return this.visitsService.getVisitsByUser(userIdNumber);
+    return this.workoutService.getWorkoutsByUser(userIdNumber);
   }
 }

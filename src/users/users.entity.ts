@@ -1,4 +1,4 @@
-import { Visit } from '../visits/visits.entity';
+import { Workout } from '../workout/workout.entity';
 import {
   Entity,
   Column,
@@ -28,6 +28,6 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Visit, (visit) => visit.user)
-  visits: Visit[];
+  @OneToMany(() => Workout, (workout) => workout.user)
+  workouts: Workout[];
 }

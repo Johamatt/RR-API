@@ -8,16 +8,15 @@ import { User } from '../users/users.entity';
 import { Place } from '../places/places.entity';
 
 @Entity()
-export class Visit {
+export class Workout {
   @PrimaryGeneratedColumn()
-  visit_id: number;
+  workout_id: number;
 
-  @ManyToOne(() => User, (user) => user.visits)
+  @ManyToOne(() => User, (user) => user.workouts)
   user: User;
 
-  @ManyToOne(() => Place, (place) => place.visits)
+  @ManyToOne(() => Place, (place) => place.workouts)
   place: Place;
-
 
   @CreateDateColumn()
   created_at: Date;

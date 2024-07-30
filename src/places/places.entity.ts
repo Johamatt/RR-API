@@ -11,7 +11,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { Visit } from '../visits/visits.entity';
+import { Workout } from '../workout/workout.entity';
 import { Address } from '../address/address.entity';
 
 @Entity()
@@ -46,8 +46,8 @@ export class Place {
   })
   linestring_coordinates: LineString;
 
-  @OneToMany(() => Visit, (visit) => visit.place)
-  visits: Visit[];
+  @OneToMany(() => Workout, (workout) => workout.place)
+  workouts: Workout[];
 
   @OneToOne(() => Address)
   @JoinColumn({ name: 'address_id' })
