@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
-import * as https from 'https';
 import * as express from 'express';
 
 async function bootstrap() {

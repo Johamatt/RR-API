@@ -2,12 +2,11 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsEmail,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Point, Polygon, LineString } from 'geojson';
-import { AddressDto } from './AddressDto';
+import { CreateAddressDto } from './AddressDto';
 
 export class CreatePlaceDto {
   @IsString()
@@ -46,8 +45,8 @@ export class CreatePlaceDto {
   public liikuntapaikkatyypinpääryhmä: string;
 
   @ValidateNested()
-  @Type(() => AddressDto)
-  public address: AddressDto;
+  @Type(() => CreateAddressDto)
+  public address: CreateAddressDto;
 
   @IsString()
   @IsOptional()

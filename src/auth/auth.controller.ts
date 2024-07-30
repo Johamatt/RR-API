@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpStatus,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Controller, Post, Body, ConflictException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/users.entity';
@@ -16,10 +9,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('google')
   async authenticate(
@@ -38,10 +28,10 @@ export class AuthController {
 
     const { sub: googleId, email } = payload;
 
-    let user = await this.usersService.findOneByGoogleId(googleId);
+    let user = await this.authService.findOneByGoogleId(googleId);
 
     if (!user) {
-      user = await this.usersService.createGoogleUser(googleId, email);
+      user = await this.authService.createGoogleUser(googleId, email);
       const { jwtToken } = await this.authService.login(user);
       return { message: 'User created', user, jwtToken: jwtToken };
     }
@@ -54,10 +44,10 @@ export class AuthController {
   async register(@Body() body: RegisterUserDto) {
     const { email } = body;
 
-    let user = await this.usersService.findByEmail(email);
+    let user = await this.authService.findByEmail(email);
 
     if (!user) {
-      user = await this.usersService.createUser(body);
+      user = await this.authService.createEmailUser(body);
       const jwtToken = await this.authService.login(user);
       return { message: 'User created', user, ...jwtToken };
     }
@@ -70,8 +60,7 @@ export class AuthController {
   async login(@Body() body: LoginUserDto) {
     const { email, password } = body;
 
-    let user = await this.usersService.findByEmailAndPassword(email, password);
-
+    let user = await this.authService.findByEmailAndPassword(email, password);
 
     const jwtToken = await this.authService.login(user);
     return { message: 'Logged in', user, ...jwtToken };

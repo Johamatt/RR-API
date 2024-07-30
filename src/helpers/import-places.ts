@@ -9,7 +9,7 @@ import { CreatePlaceDto } from '../dto/CreatePlaceDto';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
-import { AddressDto } from '../dto/AddressDto';
+import { CreateAddressDto } from '../dto/AddressDto';
 import { Address } from '../address/address.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
@@ -102,7 +102,7 @@ const main = async () => {
         continue;
       }
 
-      const addressDto: AddressDto = {
+      const addressDto: CreateAddressDto = {
         katuosoite: properties['Katuosoite'],
         kunta: properties['Kunta'],
         kuntaosa: properties['Kuntaosa'],

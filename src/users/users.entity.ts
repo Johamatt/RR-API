@@ -6,9 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  BeforeInsert,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -20,9 +18,6 @@ export class User {
 
   @Column({ unique: true })
   email: string;
-
-  @Column({ nullable: true })
-  country: string;
 
   @Column({ nullable: true })
   password: string;
