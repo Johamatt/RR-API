@@ -1,5 +1,4 @@
 import { Controller, Post, Body, ConflictException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../users/users.entity';
 import { LoginUserDto, RegisterUserDto } from '../dto/UserDto';

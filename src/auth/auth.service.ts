@@ -20,11 +20,11 @@ export class AuthService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     private jwtService: JwtService,
+    private readonly oauth2Client: OAuth2Client,
   ) {}
-  private client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   async verifyToken(token: string) {
-    const ticket = await this.client.verifyIdToken({
+    const ticket = await this.oauth2Client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
