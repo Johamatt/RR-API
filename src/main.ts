@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 import * as express from 'express';
+import { CustomExceptionFilter } from './util/custom-expection.filter';
 
 async function bootstrap() {
   const httpsOptions = {
@@ -14,6 +15,7 @@ async function bootstrap() {
     httpsOptions,
   });
   app.use(cookieParser());
+  app.useGlobalFilters(new CustomExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Strip properties that do not have any decorators

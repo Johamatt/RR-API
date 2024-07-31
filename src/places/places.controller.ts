@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Inject,
+  NotFoundException,
   Param,
   Query,
   UseGuards,
@@ -38,7 +39,11 @@ export class PlacesController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  public getPlace(@Param('id') id: string): Promise<Place> {
-    return this.service.findById(id);
+  public async getPlace(@Param('id') id: string): Promise<Place> {
+    const place = await this.service.findById(id);
+    if (!place) {
+      throw new NotFoundException('Place not found');
+    }
+    return place;
   }
 }

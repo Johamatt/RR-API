@@ -1,19 +1,17 @@
 import {
-  BadRequestException,
-  ConflictException,
-  HttpException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
+  ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OAuth2Client } from 'google-auth-library';
-import { User } from '../users/users.entity';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/dto/UserDto';
-import { compare } from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import { OAuth2Client } from 'google-auth-library';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -29,9 +27,7 @@ export class AuthService {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    if (!payload) {
-      throw new UnauthorizedException();
-    }
+    if (!payload) throw new UnauthorizedException('Invalid token');
     return payload;
   }
 
@@ -45,9 +41,7 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { email: user.email, sub: user.user_id };
-    return {
-      jwtToken: this.jwtService.sign(payload),
-    };
+    return { jwtToken: this.jwtService.sign(payload) };
   }
 
   async createGoogleUser(googleId: string, email: string): Promise<User> {
@@ -57,18 +51,15 @@ export class AuthService {
 
   async createEmailUser(createUserDto: RegisterUserDto): Promise<User> {
     const { email, password } = createUserDto;
-
     const existingUser = await this.findByEmail(email);
-    if (existingUser) {
-      throw new ConflictException('User already exists');
-    }
+    if (existingUser)
+      throw new ConflictException('User with given email already exists');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.usersRepository.create({
+    const user = this.usersRepository.create({
       email,
       password: hashedPassword,
     });
-
     return this.usersRepository.save(user);
   }
 
@@ -77,39 +68,17 @@ export class AuthService {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    try {
-      const user = await this.usersRepository.findOne({ where: { email } });
-      return user;
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to find Email');
-    }
+    return await this.usersRepository.findOne({ where: { email } });
   }
 
   async findByEmailAndPassword(
     email: string,
     password: string,
   ): Promise<User | undefined> {
-    try {
-      const user = await this.usersRepository.findOne({ where: { email } });
-
-      if (!user) {
-        throw new BadRequestException('User not found or invalid credentials');
-      }
-
-      const passwordMatch = await compare(password, user.password);
-      if (passwordMatch) {
-        return user;
-      } else {
-        throw new UnauthorizedException(
-          'User not found or invalid credentials',
-        );
-      }
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException('Internal server error');
-      }
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
+    return user;
   }
 }
