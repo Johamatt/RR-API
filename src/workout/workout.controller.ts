@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { Workout } from './workout.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateWorkoutDto } from '../dto/CreateWorkoutDto';
+import { WorkoutDto } from '../common/dto/WorkoutDto';
 import { WorkoutService } from './workout.service';
 
 @Controller('workouts')
@@ -20,14 +20,14 @@ export class WorkoutController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Body() createWorkoutDto: CreateWorkoutDto,
+    @Body() createWorkoutDto: WorkoutDto,
     @Request() req,
   ): Promise<Workout> {
     if (req.user.user_id !== createWorkoutDto.user_id) {
       throw new ForbiddenException('You can only edit your own user');
     }
     const validatedDto =
-      await this.workoutService.validateCreateWorkoutDto(createWorkoutDto);
+      await this.workoutService.validateWorkoutDto(createWorkoutDto);
     return this.workoutService.createWorkout(validatedDto);
   }
 

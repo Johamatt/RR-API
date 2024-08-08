@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Place } from './places.entity';
-import { GeoJsonDto } from '../dto/GeoJsonDto';
-import { GeoJsonPointsRequest } from '../dto/MapPointRequest';
+import { GeoJsonPointsResponse } from '../common/dto/MapPointRequest';
 
 @Injectable()
 export class PlacesService {
@@ -19,7 +18,7 @@ export class PlacesService {
     });
   }
 
-  public async GeoJsonPoints(): Promise<GeoJsonDto> {
+  public async GeoJsonPoints(): Promise<GeoJsonPointsResponse> {
     const places = await this.repository
       .createQueryBuilder('place')
       .leftJoinAndSelect('place.address', 'address')
@@ -33,7 +32,7 @@ export class PlacesService {
       ])
       .getMany();
 
-    const features: GeoJsonPointsRequest = places.map((place) => ({
+    const features: GeoJsonPointsResponse = places.map((place) => ({
       type: 'Feature',
       geometry: place.point_coordinates,
       properties: {
@@ -52,7 +51,7 @@ export class PlacesService {
 
   public async findByliikuntapaikkatyypit(
     liikuntapaikkatyyppi: string[],
-  ): Promise<GeoJsonDto> {
+  ): Promise<GeoJsonPointsResponse> {
     const places = await this.repository
       .createQueryBuilder('place')
       .leftJoinAndSelect('place.address', 'address')
@@ -69,7 +68,7 @@ export class PlacesService {
       ])
       .getMany();
 
-    const features: GeoJsonPointsRequest = places.map((place) => ({
+    const features: GeoJsonPointsResponse = places.map((place) => ({
       type: 'Feature',
       geometry: place.point_coordinates,
       properties: {

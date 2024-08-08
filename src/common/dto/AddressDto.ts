@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
-export class CreateAddressDto {
+export class AddressDto {
   @IsString()
   @IsNotEmpty()
   public katuosoite: string;

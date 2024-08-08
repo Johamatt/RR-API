@@ -1,7 +1,6 @@
 import {
   Entity,
   Column,
-  OneToMany,
   PrimaryColumn,
   Polygon,
   Point,
@@ -11,7 +10,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { Workout } from '../workout/workout.entity';
 import { Address } from '../address/address.entity';
 
 @Entity()
@@ -45,9 +43,6 @@ export class Place {
     srid: 4326,
   })
   linestring_coordinates: LineString;
-
-  @OneToMany(() => Workout, (workout) => workout.place)
-  workouts: Workout[];
 
   @OneToOne(() => Address)
   @JoinColumn({ name: 'address_id' })

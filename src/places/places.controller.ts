@@ -9,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { Place } from './places.entity';
-import { GeoJsonDto } from '../dto/GeoJsonDto';
+
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GeoJsonPointsResponse } from 'src/common/dto/MapPointRequest';
 
 @Controller('places')
 export class PlacesController {
@@ -19,7 +20,7 @@ export class PlacesController {
 
   @UseGuards(JwtAuthGuard)
   @Get('GeoJsonPoints')
-  async getPlacesGeoJson(): Promise<GeoJsonDto> {
+  async getPlacesGeoJson(): Promise<GeoJsonPointsResponse> {
     return this.service.GeoJsonPoints();
   }
 
@@ -27,7 +28,7 @@ export class PlacesController {
   @Get('GeoJsonPointsByLiikuntapaikkatyyppi')
   public async getPlacesGeoJsonByLiikuntapaikkatyyppi(
     @Query('liikuntapaikkatyyppi') liikuntapaikkatyyppi: string | string[],
-  ): Promise<GeoJsonDto> {
+  ): Promise<GeoJsonPointsResponse> {
     console.log('Received liikuntapaikkatyyppi:', liikuntapaikkatyyppi);
 
     const liikuntapaikkatyyppiArray = Array.isArray(liikuntapaikkatyyppi)

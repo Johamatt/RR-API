@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { User } from '../users/users.entity';
-import { LoginUserDto, RegisterUserDto } from '../dto/UserDto';
+import { EmailAuthRequest } from '../common/dto/EmailAuthRequest';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -25,7 +25,7 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() body: RegisterUserDto) {
+  async register(@Body() body: EmailAuthRequest) {
     let user = await this.authService.findByEmail(body.email);
     user = await this.authService.createEmailUser(body);
     const { jwtToken } = await this.authService.login(user);
@@ -33,7 +33,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: LoginUserDto) {
+  async login(@Body() body: EmailAuthRequest) {
     const { email, password } = body;
     const user = await this.authService.findByEmailAndPassword(email, password);
     const { jwtToken } = await this.authService.login(user);

@@ -1,17 +1,14 @@
 import {
   Injectable,
   BadRequestException,
-  HttpStatus,
   NotFoundException,
-  ConflictException,
 } from '@nestjs/common';
-import { CreateWorkoutDto } from '../dto/CreateWorkoutDto';
+import { WorkoutDto } from '../common/dto/WorkoutDto';
 import { Workout } from './workout.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
-import { PlacesService } from '../places/places.service';
 
 @Injectable()
 export class WorkoutService {
@@ -19,35 +16,32 @@ export class WorkoutService {
     @InjectRepository(Workout)
     private readonly workoutRepository: Repository<Workout>,
     private readonly userService: UsersService,
-    private readonly placeService: PlacesService,
   ) {}
 
-  async validateCreateWorkoutDto(
-    CreateWorkoutDto: CreateWorkoutDto,
-  ): Promise<CreateWorkoutDto> {
-    const errors = await validate(CreateWorkoutDto);
+  async validateWorkoutDto(Workout: WorkoutDto): Promise<WorkoutDto> {
+    const errors = await validate(Workout);
     if (errors.length > 0) {
       throw new BadRequestException(errors);
     }
-    return CreateWorkoutDto;
+    return Workout;
   }
 
-  async createWorkout(CreateWorkoutDto: CreateWorkoutDto): Promise<Workout> {
-    const { user_id, place_id } = CreateWorkoutDto;
+  async createWorkout(WorkoutReq: WorkoutDto): Promise<Workout> {
+    const { user_id } = WorkoutReq;
 
     const user = await this.userService.findById(user_id);
-    const place = await this.placeService.findById(place_id);
 
     if (!user) {
       throw new NotFoundException(`User with ID ${user_id} not found`);
     }
-    if (!place) {
-      throw new NotFoundException(`Place with ID ${place_id} not found`);
-    }
 
     const newWorkout = new Workout();
     newWorkout.user = user;
-    newWorkout.place = place;
+    newWorkout.name = WorkoutReq.name;
+    newWorkout.point_coordinates = WorkoutReq.point_coordinates;
+    newWorkout.linestring_coordinates = WorkoutReq.linestring_coordinates;
+    newWorkout.duration = WorkoutReq.duration;
+    newWorkout.sport = WorkoutReq.sport;
 
     return this.workoutRepository.save(newWorkout);
   }
@@ -55,7 +49,7 @@ export class WorkoutService {
   async getWorkoutsByUser(userId: number): Promise<Partial<Workout>[]> {
     const workouts = await this.workoutRepository.find({
       where: { user: { user_id: userId } },
-      relations: ['user', 'place'],
+      relations: ['user'],
     });
 
     return workouts.map((workout) => {

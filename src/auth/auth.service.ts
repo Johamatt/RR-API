@@ -2,13 +2,12 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterUserDto } from 'src/dto/UserDto';
+import { EmailAuthRequest } from 'src/common/dto/EmailAuthRequest';
 import * as bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -49,8 +48,8 @@ export class AuthService {
     return this.usersRepository.save(user);
   }
 
-  async createEmailUser(createUserDto: RegisterUserDto): Promise<User> {
-    const { email, password } = createUserDto;
+  async createEmailUser(createUser: EmailAuthRequest): Promise<User> {
+    const { email, password } = createUser;
     const existingUser = await this.findByEmail(email);
     if (existingUser)
       throw new ConflictException('User with given email already exists');

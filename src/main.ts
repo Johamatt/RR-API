@@ -4,7 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import * as fs from 'fs';
 import * as express from 'express';
-import { CustomExceptionFilter } from './util/custom-expection.filter';
+import { CustomExceptionFilter } from './common/filters/custom-expection.filter';
 
 async function bootstrap() {
   const httpsOptions = {

@@ -3,14 +3,14 @@ import { DataSource } from 'typeorm';
 
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { Place } from '../places/places.entity';
-import { AppModule } from '../app.module';
-import { CreatePlaceDto } from '../dto/CreatePlaceDto';
+import { Place } from '../../places/places.entity';
+import { AppModule } from '../../app.module';
+import { CreatePlaceDto } from '../dto/PlaceDto';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
-import { CreateAddressDto } from '../dto/AddressDto';
-import { Address } from '../address/address.entity';
+import { AddressDto } from '../dto/AddressDto';
+import { Address } from '../../address/address.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 dotenv.config({ path: '../../.env' });
@@ -102,7 +102,7 @@ const main = async () => {
         continue;
       }
 
-      const addressDto: CreateAddressDto = {
+      const addressDto: AddressDto = {
         katuosoite: properties['Katuosoite'],
         kunta: properties['Kunta'],
         kuntaosa: properties['Kuntaosa'],
