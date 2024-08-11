@@ -21,14 +21,8 @@ export class Workout {
   @Column()
   name: String;
 
-  @Index({ spatial: true })
-  @Column({
-    type: 'geometry',
-    spatialFeatureType: 'Point',
-    srid: 4326,
-    nullable: true,
-  })
-  point_coordinates?: Point;
+  @Column()
+  sport: String;
 
   @Index({ spatial: true })
   @Column({
@@ -39,12 +33,12 @@ export class Workout {
   })
   linestring_coordinates?: LineString;
 
+  @Column({ type: 'float' })
+  distanceMeters: number;
+
+  @Column({ type: 'time', nullable: true })
+  time: String;
+
   @CreateDateColumn()
   created_at: Date;
-
-  @Column()
-  duration?: String;
-
-  @Column()
-  sport: String;
 }

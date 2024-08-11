@@ -36,11 +36,12 @@ export class WorkoutService {
     }
 
     const newWorkout = new Workout();
+    newWorkout.linestring_coordinates = WorkoutReq.linestring_coordinates;
     newWorkout.user = user;
     newWorkout.name = WorkoutReq.name;
-    newWorkout.point_coordinates = WorkoutReq.point_coordinates;
-    newWorkout.linestring_coordinates = WorkoutReq.linestring_coordinates;
-    newWorkout.duration = WorkoutReq.duration;
+    newWorkout.time = WorkoutReq.time;
+    newWorkout.distanceMeters = WorkoutReq.distanceMeters;
+
     newWorkout.sport = WorkoutReq.sport;
 
     return this.workoutRepository.save(newWorkout);

@@ -1,5 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { LineString, Point } from 'typeorm';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
+import { LineString } from 'typeorm';
 
 export class WorkoutDto {
   @IsNumber()
@@ -10,17 +16,17 @@ export class WorkoutDto {
   name: String;
 
   @IsOptional()
-  point_coordinates?: Point;
-
-  @IsOptional()
   linestring_coordinates?: LineString;
 
-  @IsOptional()
-  duration?: String;
+  @IsString()
+  @Matches(/^\d{2}:\d{2}:\d{2}$/, {
+    message: 'Duration must be in the format hh:mm:ss',
+  })
+  time: string;
+
+  @IsNotEmpty()
+  distanceMeters: number;
 
   @IsOptional()
   sport?: String;
-
-  @IsOptional()
-  notes?: String;
 }
