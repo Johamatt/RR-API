@@ -24,6 +24,13 @@ export class PlacesController {
     return this.service.GeoJsonPoints();
   }
 
+  @Get('SearchGeoJsonPoints')
+  async searchPlacesGeoJson(
+    @Query('search') search: string,
+  ): Promise<GeoJsonPointsResponse> {
+    return this.service.searchGeoJsonPoints(search);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('GeoJsonPointsByLiikuntapaikkatyyppi')
   public async getPlacesGeoJsonByLiikuntapaikkatyyppi(

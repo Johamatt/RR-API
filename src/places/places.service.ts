@@ -83,4 +83,40 @@ export class PlacesService {
       features,
     };
   }
+
+  public async searchGeoJsonPoints(
+    search: string,
+  ): Promise<GeoJsonPointsResponse> {
+    const places = await this.repository
+      .createQueryBuilder('place')
+      .leftJoinAndSelect('place.address', 'address')
+      .where('place.point_coordinates IS NOT NULL')
+      .andWhere('LOWER(place.name_fi) LIKE :search', {
+        search: `%${search.toLowerCase()}%`,
+      })
+      .select([
+        'place.point_coordinates',
+        'place.place_id',
+        'place.name_fi',
+        'address.katuosoite',
+        'place.liikuntapaikkatyyppi',
+      ])
+      .getMany();
+
+    const features: GeoJsonPointsResponse = places.map((place) => ({
+      type: 'Feature',
+      geometry: place.point_coordinates,
+      properties: {
+        place_id: place.place_id,
+        name_fi: place.name_fi,
+        katuosoite: place.address.katuosoite,
+        liikuntapaikkatyyppi: place.liikuntapaikkatyyppi,
+      },
+    }));
+
+    return {
+      type: 'FeatureCollection',
+      features,
+    };
+  }
 }
