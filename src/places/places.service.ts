@@ -19,30 +19,16 @@ export class PlacesService {
   }
 
   public async GeoJsonPoints(): Promise<GeoJsonPointsResponse> {
-    const places = await this.repository
+    const features = await this.repository
       .createQueryBuilder('place')
       .leftJoinAndSelect('place.address', 'address')
       .where('place.point_coordinates IS NOT NULL')
       .select([
-        'place.point_coordinates',
-        'place.place_id',
-        'place.name_fi',
-        'address.katuosoite',
-        'place.liikuntapaikkatyyppi',
+        "'Feature' AS type",
+        `ST_AsGeoJSON(place.point_coordinates)::json AS geometry`,
+        `JSON_BUILD_OBJECT('place_id', place.place_id, 'name_fi', place.name_fi, 'katuosoite', address.katuosoite, 'liikuntapaikkatyyppi', place.liikuntapaikkatyyppi) AS properties`,
       ])
-      .getMany();
-
-    const features: GeoJsonPointsResponse = places.map((place) => ({
-      type: 'Feature',
-      geometry: place.point_coordinates,
-      properties: {
-        place_id: place.place_id,
-        name_fi: place.name_fi,
-        katuosoite: place.address.katuosoite,
-        liikuntapaikkatyyppi: place.liikuntapaikkatyyppi,
-      },
-    }));
-
+      .getRawMany();
     return {
       type: 'FeatureCollection',
       features,
@@ -52,7 +38,7 @@ export class PlacesService {
   public async findByliikuntapaikkatyypit(
     liikuntapaikkatyyppi: string[],
   ): Promise<GeoJsonPointsResponse> {
-    const places = await this.repository
+    const features = await this.repository
       .createQueryBuilder('place')
       .leftJoinAndSelect('place.address', 'address')
       .where('place.liikuntapaikkatyyppi IN (:...liikuntapaikkatyyppi)', {
@@ -60,24 +46,12 @@ export class PlacesService {
       })
       .andWhere('place.point_coordinates IS NOT NULL')
       .select([
-        'place.point_coordinates',
-        'place.place_id',
-        'place.name_fi',
-        'address.katuosoite',
-        'place.liikuntapaikkatyyppi',
+        "'Feature' AS type",
+        `ST_AsGeoJSON(place.point_coordinates)::json AS geometry`,
+        `JSON_BUILD_OBJECT('place_id', place.place_id, 'name_fi', place.name_fi, 'katuosoite', address.katuosoite, 'liikuntapaikkatyyppi', place.liikuntapaikkatyyppi) AS properties`,
       ])
-      .getMany();
+      .getRawMany();
 
-    const features: GeoJsonPointsResponse = places.map((place) => ({
-      type: 'Feature',
-      geometry: place.point_coordinates,
-      properties: {
-        place_id: place.place_id,
-        name_fi: place.name_fi,
-        katuosoite: place.address.katuosoite,
-        liikuntapaikkatyyppi: place.liikuntapaikkatyyppi,
-      },
-    }));
     return {
       type: 'FeatureCollection',
       features,
@@ -87,7 +61,7 @@ export class PlacesService {
   public async searchGeoJsonPoints(
     search: string,
   ): Promise<GeoJsonPointsResponse> {
-    const places = await this.repository
+    const features = await this.repository
       .createQueryBuilder('place')
       .leftJoinAndSelect('place.address', 'address')
       .where('place.point_coordinates IS NOT NULL')
@@ -95,24 +69,11 @@ export class PlacesService {
         search: `%${search.toLowerCase()}%`,
       })
       .select([
-        'place.point_coordinates',
-        'place.place_id',
-        'place.name_fi',
-        'address.katuosoite',
-        'place.liikuntapaikkatyyppi',
+        "'Feature' AS type",
+        `ST_AsGeoJSON(place.point_coordinates)::json AS geometry`,
+        `JSON_BUILD_OBJECT('place_id', place.place_id, 'name_fi', place.name_fi, 'katuosoite', address.katuosoite, 'liikuntapaikkatyyppi', place.liikuntapaikkatyyppi) AS properties`,
       ])
-      .getMany();
-
-    const features: GeoJsonPointsResponse = places.map((place) => ({
-      type: 'Feature',
-      geometry: place.point_coordinates,
-      properties: {
-        place_id: place.place_id,
-        name_fi: place.name_fi,
-        katuosoite: place.address.katuosoite,
-        liikuntapaikkatyyppi: place.liikuntapaikkatyyppi,
-      },
-    }));
+      .getRawMany();
 
     return {
       type: 'FeatureCollection',
