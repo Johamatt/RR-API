@@ -1,8 +1,3 @@
-export function calculateTime(time: string): number {
-  const [hours, minutes, seconds] = time.split(':').map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
-}
-
 export function formatTime(seconds: number): string {
   const days = Math.floor(seconds / (24 * 3600));
   seconds %= 24 * 3600;

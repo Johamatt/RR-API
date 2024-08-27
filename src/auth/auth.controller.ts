@@ -44,9 +44,7 @@ export class AuthController {
   async validateToken(
     @Headers('Authorization') authHeader: string,
   ): Promise<Boolean> {
-    console.log(authHeader);
     const token = authHeader.split(' ')[1];
-
     return await this.authService.verifyToken(token);
   }
 }
