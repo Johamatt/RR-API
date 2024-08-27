@@ -44,4 +44,18 @@ export class WorkoutController {
     const userIdNumber = parseInt(user_id, 10);
     return this.workoutService.getWorkoutsByUser(userIdNumber);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('totals')
+  async getWorkoutTotals(
+    @Request() req,
+    @Query('user_id') user_id: string,
+  ): Promise<{ totalDistanceKM: number; totalTime: string }> {
+    const userIdFromReq = String(req.user.user_id);
+    if (userIdFromReq !== user_id) {
+      throw new ForbiddenException('You can only view your own workouts');
+    }
+    const userIdNumber = parseInt(user_id, 10);
+    return this.workoutService.calculateTotals(userIdNumber);
+  }
 }

@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
+import { calculateTime, formatTime } from '../common/helpers/calculateTime';
 
 @Injectable()
 export class WorkoutService {
@@ -57,5 +58,41 @@ export class WorkoutService {
       const { user, ...workoutWithoutUser } = workout;
       return workoutWithoutUser;
     });
+  }
+
+  async getWorkoutTotalsByUser(userId: number): Promise<Partial<Workout>[]> {
+    const workouts = await this.workoutRepository.find({
+      where: { user: { user_id: userId } },
+      relations: ['user'],
+    });
+
+    return workouts.map((workout) => {
+      const { user, ...workoutWithoutUser } = workout;
+      return workoutWithoutUser;
+    });
+  }
+
+  async calculateTotals(
+    userId: number,
+  ): Promise<{ totalDistanceKM: number; totalTime: string }> {
+    const workouts = await this.getWorkoutsByUser(userId);
+
+    const totalDistanceMeters = workouts.reduce(
+      (acc, workout) => acc + workout.distanceMeters,
+      0,
+    );
+    const totalDistanceKilometers = totalDistanceMeters / 1000; // Convert meters to kilometers
+    const formattedDistance = parseFloat(totalDistanceKilometers.toFixed(2));
+
+    const totalSeconds = workouts.reduce(
+      (acc, workout) => acc + calculateTime(workout.time),
+      0,
+    );
+    const formattedTime = formatTime(totalSeconds);
+
+    return {
+      totalDistanceKM: formattedDistance,
+      totalTime: formattedTime,
+    };
   }
 }

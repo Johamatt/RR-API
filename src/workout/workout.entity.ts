@@ -37,7 +37,7 @@ export class Workout {
   distanceMeters: number;
 
   @Column({ type: 'time', nullable: true })
-  time: String;
+  time: string;
 
   @CreateDateColumn()
   created_at: Date;
