@@ -20,7 +20,7 @@ export class AuthService {
     private readonly oauth2Client: OAuth2Client,
   ) {}
 
-  async verifyToken(token: string) {
+  async verifyGoogleToken(token: string) {
     const ticket = await this.oauth2Client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -79,5 +79,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     return user;
+  }
+
+  async verifyToken(token: string): Promise<boolean> {
+    try {
+      this.jwtService.verify(token);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }

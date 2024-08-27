@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Headers } from '@nestjs/common';
 import { User } from '../users/users.entity';
 import { EmailAuthRequest } from '../common/dto/EmailAuthRequest';
 import { AuthService } from './auth.service';
@@ -11,7 +11,7 @@ export class AuthController {
   async authenticate(
     @Body('idToken') idToken: string,
   ): Promise<{ message: string; user: User; jwtToken?: string }> {
-    const payload = await this.authService.verifyToken(idToken);
+    const payload = await this.authService.verifyGoogleToken(idToken);
 
     const { sub: googleId, email } = payload;
     let user = await this.authService.findOneByGoogleId(googleId);
@@ -38,5 +38,15 @@ export class AuthController {
     const user = await this.authService.findByEmailAndPassword(email, password);
     const { jwtToken } = await this.authService.login(user);
     return { message: 'Logged in', user, jwtToken };
+  }
+
+  @Get('validate-token')
+  async validateToken(
+    @Headers('Authorization') authHeader: string,
+  ): Promise<Boolean> {
+    console.log(authHeader);
+    const token = authHeader.split(' ')[1];
+
+    return await this.authService.verifyToken(token);
   }
 }
