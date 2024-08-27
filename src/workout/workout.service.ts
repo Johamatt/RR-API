@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
-import { formatTime } from '../common/helpers/calculateTime';
+import { formatTime, parseTimeString } from '../common/helpers/calculateTime';
 
 @Injectable()
 export class WorkoutService {
@@ -81,5 +81,20 @@ export class WorkoutService {
       totalDistanceKM,
       totalTime,
     };
+  }
+
+  async getLatestWorkouts(userId: number, limit: number): Promise<any[]> {
+    const workouts = await this.workoutRepository
+      .createQueryBuilder('workout')
+      .where('workout.user = :userId', { userId })
+      .orderBy('workout.created_at', 'DESC')
+      .limit(limit)
+      .getMany();
+
+    return workouts.map((workout) => ({
+      ...workout,
+      distanceMeters: parseFloat((workout.distanceMeters / 1000).toFixed(3)),
+      time: workout.time ? formatTime(parseTimeString(workout.time)) : null,
+    }));
   }
 }

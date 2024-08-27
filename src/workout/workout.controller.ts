@@ -50,12 +50,25 @@ export class WorkoutController {
   async getWorkoutTotals(
     @Request() req,
     @Query('user_id') user_id: string,
-  ): Promise<{ totalDistanceKM: number; totalTime: string }> {
+  ): Promise<{
+    totalDistanceKM: number;
+    totalTime: string;
+    latestWorkouts: Workout[];
+  }> {
     const userIdFromReq = String(req.user.user_id);
     if (userIdFromReq !== user_id) {
       throw new ForbiddenException('You can only view your own workouts');
     }
     const userIdNumber = parseInt(user_id, 10);
-    return this.workoutService.calculateTotals(userIdNumber);
+    const totals = await this.workoutService.calculateTotals(userIdNumber);
+    const latestWorkouts = await this.workoutService.getLatestWorkouts(
+      userIdNumber,
+      3,
+    );
+
+    return {
+      ...totals,
+      latestWorkouts,
+    };
   }
 }
