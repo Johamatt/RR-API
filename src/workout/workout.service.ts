@@ -55,9 +55,11 @@ export class WorkoutService {
     });
   }
 
-  async calculateTotals(
-    userId: number,
-  ): Promise<{ totalDistanceKM: number; totalTime: string }> {
+  async calculateTotals(userId: number): Promise<{
+    totalDistanceKM: number;
+    totalTime: string;
+    totalWorkouts: number;
+  }> {
     const result = await this.workoutRepository
       .createQueryBuilder('workout')
       .select('SUM(workout.distanceMeters)', 'totalDistanceMeters')
@@ -69,6 +71,7 @@ export class WorkoutService {
       `,
         'totalTimeInSeconds',
       )
+      .addSelect('COUNT(workout.workout_id)', 'totalWorkouts')
       .where('workout.user = :userId', { userId })
       .getRawOne();
 
@@ -76,10 +79,12 @@ export class WorkoutService {
       (result.totalDistanceMeters / 1000).toFixed(2),
     );
     const totalTime = formatTime(result.totalTimeInSeconds);
+    const totalWorkouts = parseInt(result.totalWorkouts, 10);
 
     return {
       totalDistanceKM,
       totalTime,
+      totalWorkouts,
     };
   }
 
