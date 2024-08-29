@@ -6,10 +6,14 @@ import {
 import { WorkoutDto } from '../common/dto/WorkoutDto';
 import { Workout } from './workout.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LineString, Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
 import { formatTime, parseTimeString } from '../common/helpers/calculateTime';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
+
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class WorkoutService {
@@ -17,6 +21,8 @@ export class WorkoutService {
     @InjectRepository(Workout)
     private readonly workoutRepository: Repository<Workout>,
     private readonly userService: UsersService,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateWorkoutDto(Workout: WorkoutDto): Promise<WorkoutDto> {
@@ -96,10 +102,46 @@ export class WorkoutService {
       .limit(limit)
       .getMany();
 
-    return workouts.map((workout) => ({
-      ...workout,
-      distanceMeters: parseFloat((workout.distanceMeters / 1000).toFixed(3)),
-      time: workout.time ? formatTime(parseTimeString(workout.time)) : null,
-    }));
+    return await Promise.all(
+      workouts.map(async (workout) => {
+        const coordinates = this.extractCoordinates(
+          workout.linestring_coordinates,
+        );
+        const staticMapUrl = await this.generateStaticMapUrl(coordinates);
+        return {
+          ...workout,
+          distanceMeters: parseFloat(
+            (workout.distanceMeters / 1000).toFixed(3),
+          ),
+          time: workout.time ? formatTime(parseTimeString(workout.time)) : null,
+          staticMapUrl,
+        };
+      }),
+    );
+  }
+
+  private extractCoordinates(linestring: LineString): string {
+    return linestring.coordinates
+      .map((coordinate) => `${coordinate[0]},${coordinate[1]}`)
+      .join(';');
+  }
+
+  private async generateStaticMapUrl(coordinates: string): Promise<string> {
+    const token = this.configService.get<string>('MAPBOX_ACCESS_TOKEN');
+    const path = `path-5+ff0000-0.6(${coordinates})`;
+    const url = `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/${path}/auto/500x300?access_token=${token}`;
+
+    try {
+      const response = await lastValueFrom(this.httpService.get(url));
+      if (response.status === 200) {
+        // TODO , url contains pk.
+        return url;
+      } else {
+        throw new Error('Failed to generate static map URL');
+      }
+    } catch (e) {
+      console.error(e);
+      return '';
+    }
   }
 }
