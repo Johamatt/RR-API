@@ -134,7 +134,6 @@ export class WorkoutService {
     try {
       const response = await lastValueFrom(this.httpService.get(url));
       if (response.status === 200) {
-        // TODO , url contains pk.
         return url;
       } else {
         throw new Error('Failed to generate static map URL');
