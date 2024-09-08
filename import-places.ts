@@ -3,14 +3,14 @@ import { DataSource } from 'typeorm';
 
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { Place } from '../../places/places.entity';
-import { AppModule } from '../../app.module';
-import { CreatePlaceDto } from '../dto/PlaceDto';
+import { Place } from './src/places/places.entity';
+import { AppModule } from './src/app.module';
+import { CreatePlaceDto } from './src/common/dto/PlaceDto';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
-import { AddressDto } from '../dto/AddressDto';
-import { Address } from '../../address/address.entity';
+import { AddressDto } from './src/common/dto/AddressDto';
+import { Address } from './src/address/address.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 dotenv.config({ path: '../../.env' });
@@ -74,13 +74,18 @@ const appDataSource = new DataSource({
 const main = async () => {
   try {
     console.time('main');
+    let insertedCount = 0;
+
     await appDataSource.initialize();
 
     const app = await NestFactory.createApplicationContext(AppModule);
     const placeRepository = appDataSource.getRepository(Place);
     const addressRepository = appDataSource.getRepository(Address);
 
-    const geojsonFilePath = path.resolve(__dirname, '../../places4.geojson');
+    const geojsonFilePath = path.resolve(__dirname, '/app/places.geojson');
+
+    console.log(geojsonFilePath);
+
     const data = fs.readFileSync(geojsonFilePath, 'utf8');
     const geojson = JSON.parse(data);
 
@@ -205,6 +210,11 @@ const main = async () => {
           await addressRepository.save(address);
           place.address = address;
           await placeRepository.save(place);
+
+          insertedCount++;
+          if (insertedCount % 1000 === 0) {
+            console.log(`${insertedCount} places inserted...`);
+          }
         }
       } catch (err) {
         console.error('Error saving place:', err);

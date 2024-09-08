@@ -1,13 +1,12 @@
-# Geo API with NestJS & PostGIS
-This application enables users to find the location information of sport places in Finland by utilizing spatial location search.
+# Geo Sport APP with NestJS & PostGIS
+This application serves as the backend for a sports app that tracks users' workouts and helps them locate sports facilities across Finland through spatial location search.
 
 Android UI:
 https://github.com/Johamatt/RR-Android
 
 ## Prerequisites
-- [PostgreSQL] running locally initialized with [PostGIS] -extension
-- [Node] installed on your machine
-
+- [Docker]
+- [Node]
 ---
 
 ## Download data
@@ -17,7 +16,6 @@ https://github.com/Johamatt/RR-Android
 3. Add all quick selections (Pikavalinnat)
 4. Select GeoJSON from dropdown
 5. Save it as places.geojson file and add it in project root folder
-6. Run script in helpers -folder.
 
 ---
 
@@ -26,24 +24,28 @@ https://github.com/Johamatt/RR-Android
 ```bash
 $ git clone https://github.com/Johamatt/RR-API.git
 $ cd sport-geo-api
-$ npm install
 ```
 
-## Setting Up the Application
+## Running the app
 
-1. **Create the .env File**:
-   - Add the necessary `DATABASE_****` values as specified in `/src/app.module.ts`.
+- Rename **env.example** to **.env** and change the variable values to your liking (The default values will work, but some features may be limited without further configuration.)
+- Start Nestjs application and database server:
 
-2. **Configure JWT token**:
-   - Define to`JWT_SECRET=` with any string value.
+```cmd
+$ docker compose up --build
+```
+- Wait till application starts and run script:
+```cmd
+$ docker exec sport-geo-api-api-1 ts-node import-places.ts
+```
+- Access application on localhost:3000
+- You are done 🔥
 
-3. **Set Up Google OAuth (optional..)**:
+## Optional
+ **Set Up Google OAuth**:
    - Create a Google OAuth Client ID (Web application) from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
    - Add the Client ID to the `.env` file as `GOOGLE_CLIENT_ID=`.
   - in Front-end, add this value to res/values/developer-config.xml
   
-
-    
-   [PostgreSQL]: <https://www.postgresql.org/download/>
    [Node]: <https://nodejs.org/en/download>
-   [PostGIS]: <https://postgis.net/documentation/getting_started/#:~:text=CREATE%20EXTENSION%20postgis%3B>
+   [Docker]: <https://www.docker.com/products/docker-desktop/>

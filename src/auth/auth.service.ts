@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { User } from '../users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { EmailAuthRequest } from 'src/common/dto/EmailAuthRequest';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
