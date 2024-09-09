@@ -16,10 +16,9 @@ export function formatTime(totalSeconds: number): string {
   if (days > 0) parts.push(`${days}d`);
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
-  else if (hours === 0 && minutes === 0 && seconds > 0)
-    parts.push(`${seconds}s`);
-
-  if (hours === 0 && minutes === 0 && seconds > 0) parts.push(`${seconds}s`);
+  if (seconds > 0) parts.push(`${seconds}s`);
 
   return parts.join(' ');
 }
+
+

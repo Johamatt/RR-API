@@ -33,7 +33,7 @@ export class Workout {
   })
   linestring_coordinates?: LineString;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'int' })
   distanceMeters: number;
 
   @Column({ type: 'time', nullable: true })

@@ -51,7 +51,7 @@ export class WorkoutController {
     @Request() req,
     @Query('user_id') user_id: string,
   ): Promise<{
-    totalDistanceKM: number;
+    totalDistance: number;
     totalTime: string;
     latestWorkouts: Workout[];
   }> {
@@ -65,7 +65,7 @@ export class WorkoutController {
       userIdNumber,
       3,
     );
-
+    console.log(totals);
     return {
       ...totals,
       latestWorkouts,

@@ -9,7 +9,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LineString, Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { UsersService } from '../users/users.service';
-import { formatTime, parseTimeString } from '../common/helpers/calculateTime';
+import {
+  formatTime,
+  parseTimeString,
+} from '../common/helpers/timeFormatter';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 
@@ -62,7 +65,7 @@ export class WorkoutService {
   }
 
   async calculateTotals(userId: number): Promise<{
-    totalDistanceKM: number;
+    totalDistance: number;
     totalTime: string;
     totalWorkouts: number;
   }> {
@@ -81,14 +84,12 @@ export class WorkoutService {
       .where('workout.user = :userId', { userId })
       .getRawOne();
 
-    const totalDistanceKM = parseFloat(
-      (result.totalDistanceMeters / 1000).toFixed(2),
-    );
+    const totalDistance = result.totalDistanceMeters;
     const totalTime = formatTime(result.totalTimeInSeconds);
     const totalWorkouts = parseInt(result.totalWorkouts, 10);
 
     return {
-      totalDistanceKM,
+      totalDistance,
       totalTime,
       totalWorkouts,
     };
@@ -110,9 +111,6 @@ export class WorkoutService {
         const staticMapUrl = await this.generateStaticMapUrl(coordinates);
         return {
           ...workout,
-          distanceMeters: parseFloat(
-            (workout.distanceMeters / 1000).toFixed(3),
-          ),
           time: workout.time ? formatTime(parseTimeString(workout.time)) : null,
           staticMapUrl,
         };
